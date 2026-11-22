@@ -63,6 +63,10 @@ export interface TestAppOptions {
   planPrices?: Record<string, number>;
   adminEmail?: string;
   rateLimits?: Partial<Config['rateLimits']>;
+  /** X-Forwarded-For'a güvenilecek adresler; '' = hiçbirine. Varsayılan '127.0.0.1,::1'. */
+  trustedProxies?: string;
+  /** Sahte ödeme ucu açık mı. Varsayılan true. */
+  devPaymentsEnabled?: boolean;
 }
 
 const WEBHOOK_SECRET = 'test-webhook-secret-test-webhook-secret';
@@ -94,8 +98,8 @@ export async function createTestApp(opts: TestAppOptions = {}): Promise<TestApp>
     adminEmail: opts.adminEmail ?? TEST_ADMIN_EMAIL,
     randevuApiUrl: '',
     randevuApiKey: '',
-    devPaymentsEnabled: true,
-    trustedProxies: '127.0.0.1,::1',
+    devPaymentsEnabled: opts.devPaymentsEnabled ?? true,
+    trustedProxies: opts.trustedProxies ?? '127.0.0.1,::1',
     production: false,
     // Testlerde sınırlar varsayılan olarak geniş; sınırı deneyen test kendi değerini verir.
     rateLimits: { registerPerIpHour: 10_000, forgotPerEmailHour: 10_000, forgotPerIpHour: 10_000, loginPerIp15m: 10_000, ...opts.rateLimits },
