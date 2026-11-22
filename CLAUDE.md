@@ -12,7 +12,7 @@ Hedef: Ozan satış sürecinde elle hiçbir şey yapmasın. Müşteri paketi se�
 - Emlak Sistemi (aylık) — teyit edilecek.
 - Logo ERP Entegrasyonu — projeye göre teklif; ödeme siteden, aşama aşama alınır.
 
-Fiyatlar Ozan'dan gelir. Fiyat, özellik veya yasal metin uydurma; bilinmiyorsa `[FİYAT]`, "teyit edilecek" yaz.
+Fiyatlar Ozan'dan gelir ve **KDV dahildir** (Ozan, 22 Kasım 2026); tutarlar henüz belirlenmedi. Fiyat, özellik veya yasal metin uydurma; bilinmiyorsa `[FİYAT]`, "teyit edilecek" yaz.
 
 ## Tasarım kuralları (değiştirmeden önce Ozan'a sor)
 

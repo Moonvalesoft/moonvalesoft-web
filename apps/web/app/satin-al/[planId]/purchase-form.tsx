@@ -207,7 +207,7 @@ export function PurchaseForm({
               {plan.interval === 'month' ? ', aylık abonelik' : ''}
             </dd>
             <dt className="text-subtle">Toplam</dt>
-            <dd className="font-semibold">{formatTL(total)} [KDV NOTU: teyit edilecek]</dd>
+            <dd className="font-semibold">{formatTL(total)} (KDV dahil)</dd>
             <dt className="text-subtle">İptal</dt>
             <dd>İstediğin zaman panelinden iptal edersin; dönem sonuna kadar kullanırsın. Cayma hakkı ve iade koşulları: teyit edilecek.</dd>
           </dl>
@@ -236,7 +236,7 @@ export function PurchaseForm({
           )}
           <div className="flex justify-between">
             <dt className="text-muted">Vergiler</dt>
-            <dd>[KDV NOTU]</dd>
+            <dd>KDV dahil</dd>
           </div>
         </dl>
         <div className="mt-4 flex items-baseline justify-between">
@@ -261,7 +261,7 @@ export function PurchaseForm({
           </Checkbox>
         </div>
         <Button type="submit" disabled={busy} className="mt-5 min-h-14 w-full">
-          {busy ? 'Ödeme sayfası hazırlanıyor…' : 'Ödemeye geç'}
+          {busy ? 'Ödeme sayfası hazırlanıyor…' : 'Siparişi onayla ve öde'}
         </Button>
         <p className="mt-4 flex gap-2 text-sm text-subtle">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="mt-1 shrink-0">
