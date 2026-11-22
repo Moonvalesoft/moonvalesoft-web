@@ -1,0 +1,47 @@
+/* Otomatik üretildi: npm run tokens. Elle düzenleme; design/tokens.json değiştir. */
+:root, [data-theme="gece"] {
+  --mv-moon: #F3E2A9;
+  --mv-background: #0A0E1F;
+  --mv-surface: #121833;
+  --mv-surface-raised: #161D3D;
+  --mv-section-alt: #0E1328;
+  --mv-border: #222A4D;
+  --mv-border-strong: #3A4372;
+  --mv-text: #EDEFF7;
+  --mv-text-muted: #B9BFD6;
+  --mv-text-subtle: #A7AEC8;
+  --mv-accent: #F3E2A9;
+  --mv-on-accent: #0A0E1F;
+  --mv-accent-text: #F3E2A9;
+  --mv-secondary: #A99BFF;
+  --mv-on-secondary: #0A0E1F;
+  --mv-success: #7BE0A8;
+  --mv-danger: #FF9B8F;
+}
+:root, [data-theme="gece"] { color-scheme: dark; }
+[data-theme="gunduz"] {
+  --mv-moon: #F1D77E;
+  --mv-background: #F4F5FA;
+  --mv-surface: #FFFFFF;
+  --mv-surface-raised: #FFFFFF;
+  --mv-section-alt: #EAECF5;
+  --mv-border: #DCE0EC;
+  --mv-border-strong: #BFC5DA;
+  --mv-text: #141A33;
+  --mv-text-muted: #4A5272;
+  --mv-text-subtle: #596180;
+  --mv-accent: #1B2350;
+  --mv-on-accent: #FFFFFF;
+  --mv-accent-text: #7A5C0E;
+  --mv-secondary: #4733C9;
+  --mv-on-secondary: #FFFFFF;
+  --mv-success: #146C43;
+  --mv-danger: #B42318;
+}
+[data-theme="gunduz"] { color-scheme: light; }
+:root {
+  --mv-radius-sm: 12px;
+  --mv-radius-md: 14px;
+  --mv-radius-lg: 22px;
+  --mv-max-width: 1180px;
+}

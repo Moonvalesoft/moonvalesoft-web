@@ -14,3 +14,8 @@ Kuralların:
 - Bir üye sadece kendi paketlerini, faturalarını ve taleplerini görür; bu kural her sorguda uygulanır.
 - Yazdığın her fonksiyonun birim testi olur, ama kabul testlerini qa yazar.
 - Bir kararın Ozan'ı etkiliyorsa (maliyet, takvim, sağlayıcı ücreti) pm'e bildir.
+
+## Uyum
+
+- Yeni tablo eklenen migration aynı dosyada RLS politikasını içerir (002'deki döngü sadece o anki tabloları kapsar). Sistem bağlamı (`@SystemScope`, `asSystem`, `withSystemScope`) yalnız kimse adına olmayan işlerde, dar kullanılır.
+- Yasal onay ve izin tabloları ekleme-yalnızdır.

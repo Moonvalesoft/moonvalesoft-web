@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/space-grotesk";
+
+/* Renkler yalnızca tokens.css'ten (design/tokens.json). */
+@theme inline {
+  --color-bg: var(--mv-background);
+  --color-surface: var(--mv-surface);
+  --color-surface-raised: var(--mv-surface-raised);
+  --color-section: var(--mv-section-alt);
+  --color-line: var(--mv-border);
+  --color-line-strong: var(--mv-border-strong);
+  --color-fg: var(--mv-text);
+  --color-muted: var(--mv-text-muted);
+  --color-subtle: var(--mv-text-subtle);
+  --color-accent: var(--mv-accent);
+  --color-on-accent: var(--mv-on-accent);
+  --color-accent-text: var(--mv-accent-text);
+  --color-moon: var(--mv-moon);
+  --color-secondary: var(--mv-secondary);
+  --color-on-secondary: var(--mv-on-secondary);
+  --color-success: var(--mv-success);
+  --color-danger: var(--mv-danger);
+  --font-sans: "Inter Variable", system-ui, sans-serif;
+  --font-heading: "Space Grotesk Variable", system-ui, sans-serif;
+  --radius-sm: var(--mv-radius-sm);
+  --radius-md: var(--mv-radius-md);
+  --radius-lg: var(--mv-radius-lg);
+}
+
+/* Katmanda dursun: katmansız kural Tailwind sınıflarını ezer (ör. düğme yazı rengi). */
+@layer base {
+  html { background: var(--mv-background); }
+  body { @apply bg-bg text-fg font-sans antialiased; line-height: 1.6; }
+  h1, h2, h3 { @apply font-heading; letter-spacing: -0.02em; }
+  a { color: var(--mv-accent-text); }
+  :focus-visible { outline: 2px solid var(--mv-secondary); outline-offset: 2px; border-radius: 4px; }
+}
+@layer components {
+  .container-mv { width: 100%; max-width: var(--mv-max-width); margin-inline: auto; padding-inline: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
