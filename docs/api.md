@@ -16,7 +16,7 @@ Hata gövdesi her zaman: `{ "code": "MAKİNE_KODU", "message": "Türkçe açıkl
 
 | Uç | Gövde | Sonuç |
 | --- | --- | --- |
-| `POST /api/auth/register` | `{ email, password, name, noticeVersion, marketingEmail? }` | Her zaman `202 { ok: true }` (e-posta kayıtlı olsa bile; kayıtlıysa "zaten hesabın var" e-postası gider). Şifre en az 10 karakter, değilse `400 WEAK_PASSWORD`. Geçersiz e-posta `400 INVALID_EMAIL`. Doğrulama e-postası gider. |
+| `POST /api/auth/register` | `{ email, password, name, noticeVersion, marketingEmail? }` | Her zaman `202 { ok: true }` (e-posta kayıtlı olsa bile; kayıtlıysa "zaten hesabın var" e-postası gider). Şifre en az 10 karakter, değilse `400 WEAK_PASSWORD`. Ad 2–100 karakter, değilse `400 VALIDATION`. Geçersiz e-posta `400 INVALID_EMAIL`. Doğrulama e-postası gider. |
 | `POST /api/auth/verify-email` | `{ token }` | `200 { ok: true }`. Token tek kullanımlık, 24 saat geçerli; aksi `400 INVALID_TOKEN`. |
 | `POST /api/auth/login` | `{ email, password }` | `200 { user }` + çerez. Yanlış bilgi `401 INVALID_CREDENTIALS`. E-posta doğrulanmamış `403 EMAIL_NOT_VERIFIED`. Aynı e-postaya 15 dakikada 5 hatalı denemeden sonra `429 TOO_MANY_ATTEMPTS` (doğru şifre girilse bile). |
 | `POST /api/auth/logout` | — | `204`, oturum sunucuda silinir. |

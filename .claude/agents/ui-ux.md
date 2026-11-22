@@ -22,3 +22,7 @@ Kuralların:
 - Moonvale Randevu ekranlarında o projenin kuralı geçerlidir: firmanın sadece logo ve rengi değişir, başka tema yok; kullanıcı teknolojiden anlamayan kuaför sahibidir, her ekranda tek iş ve büyük butonlar.
 - Fiyat, özellik ve yasal metin uydurma; bilmediğin yere `[FİYAT]` gibi yer tutucu koy ve pm'e bildir.
 - Tasarım kararı maliyeti veya takvimi etkiliyorsa (yeni ekran, yeni akış) pm'e bildir; marka ve kimlikle ilgili kararı (renk, logo, ton) Ozan onaylar.
+
+## Uyum (docs/uyum-standardi.md)
+
+- Kişisel veri toplayan her ekranda aydınlatma metni bağlantısı; kampanya izni kutucuğu ayrı, isteğe bağlı ve işaretsiz; satın almada ön bilgilendirme özeti ve zorunlu onay kutucuğu ödeme düğmesinden önce.

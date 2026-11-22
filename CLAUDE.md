@@ -23,6 +23,15 @@ Fiyatlar Ozan'dan gelir. Fiyat, özellik veya yasal metin uydurma; bilinmiyorsa 
 - Erişilebilirlik: her iki modda metin kontrastı en az 4.5:1, dokunma alanı en az 44 px, klavyeyle gezilebilir.
 - Onaylı tasarım tuvali: https://claude.ai/artifact/1SscxbqpGfU3zmStL96iVL (artboard "3 · Gece" ve "3b · Gündüz").
 
+## Uyum kuralları (bütün Moonvalesoft ürünleri, ayrıntı: `docs/uyum-standardi.md`)
+
+1. **RLS açık:** bütün tablolarda `ENABLE` + `FORCE ROW LEVEL SECURITY`; API `mv_app` rolüyle çalışır (süper kullanıcı değil, `BYPASSRLS` yok); bağlam `app.user_id` veya açıkça yazılmış `app.system`; bağlamsız sorgu satır görmez.
+2. **Aydınlatma metni:** kişisel veri toplayan her formda bağlantı; üyelikte "okudum" kutucuğu zorunlu; gösterilen sürüm `legal_acknowledgements`'a yazılır.
+3. **Kampanya izni:** ayrı, isteğe bağlı, işaretsiz kutucuk; her değişiklik `marketing_consents`'e yeni satır; panelden tek tıkla geri alınır; işlem e-postalarına kampanya konmaz.
+4. **Ön bilgilendirme:** her satın almada ödeme öncesi ön bilgilendirme + mesafeli satış sözleşmesi, zorunlu onay, siparişe bağlı kayıt, e-postayla kopya.
+
+Metinleri hukukçu yazar; sürümleri `apps/api/src/legal/documents.ts` tutar.
+
 ## Teknik kararlar (taslak — Ozan onayı bekliyor)
 
 - Moonvale Randevu ile aynı yığın, tek geliştirici iki farklı dünya öğrenmesin diye:
@@ -42,6 +51,6 @@ Fiyatlar Ozan'dan gelir. Fiyat, özellik veya yasal metin uydurma; bilinmiyorsa 
 - Her değişiklik bir PR'dır; testler geçmeden ve Ozan onaylamadan birleştirme yok.
 - Ekran işi önce ui-ux'ten geçer: ui-ux tasarımı ve kabul kriterlerini yazar, frontend uygular, ui-ux PR'ı tasarıma uygunluk için inceler.
 - Kabul testlerini QA önceden yazar; kodu yazan ajan kendi kabul testini yazıp geçirmez.
-- Asla atlanmayacak testler: ödeme webhook'u (sahte, tekrarlanan, sırası bozuk istek), başarısız ödeme, abonelik iptali, bir üyenin başka üyenin faturasını görememesi.
+- Asla atlanmayacak testler: ödeme webhook'u (sahte, tekrarlanan, sırası bozuk istek), başarısız ödeme, abonelik iptali, bir üyenin başka üyenin faturasını görememesi, RLS (her tabloda açık, bağlamsız sorgu boş), aydınlatma/izin/ön bilgilendirme kayıtları.
 - Uydurma rakam, fiyat veya hukuki kesinlik yazma; bilmiyorsan "teyit edilecek" de.
 - Yazışma dili Türkçe; kod, tablo ve değişken adları İngilizce.
