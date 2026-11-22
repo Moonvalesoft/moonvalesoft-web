@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.json",
     "start": "node dist/main.js",
     "dev": "tsx watch src/main.ts",
     "migrate": "node dist/db/migrate-cli.js",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc -p tsconfig.test.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.11",
