@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { PoolClient } from 'pg';
 import { ApiError } from '../common/errors';
+import { SystemScope } from '../db/scope';
 import { DEPS, type AppDeps } from '../deps';
 import { findPlan } from '../catalog/plans';
 import { enqueueJob } from '../jobs/jobs.service';
@@ -68,6 +69,7 @@ export class WebhooksService {
 
   constructor(@Inject(DEPS) private readonly deps: AppDeps) {}
 
+  @SystemScope()
   async handle(rawBody: string, headers: Record<string, string | string[] | undefined>): Promise<void> {
     const event = this.deps.payments.parseWebhook(rawBody, headers);
     if (!event) {

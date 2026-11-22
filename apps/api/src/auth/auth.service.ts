@@ -6,6 +6,9 @@ import { DAY, HOUR, MINUTE } from '../common/clock';
 import { ApiError } from '../common/errors';
 import { DEPS, type AppDeps } from '../deps';
 import { mails } from '../mail/templates';
+import { SystemScope } from '../db/scope';
+import { currentVersion, type RequestMeta } from '../legal/documents';
+import { recordAcknowledgement, recordMarketingConsent } from '../legal/consents.service';
 
 export const SESSION_COOKIE = 'mv_session';
 export const SESSION_TTL_MS = 30 * DAY;
@@ -69,7 +72,13 @@ export class AuthService {
     return token;
   }
 
-  async register(body: Record<string, unknown>): Promise<void> {
+  @SystemScope()
+  async register(body: Record<string, unknown>, meta: RequestMeta = { ip: null, userAgent: null }): Promise<void> {
+    const noticeVersion = currentVersion('aydinlatma');
+    if (body.noticeVersion !== noticeVersion) {
+      throw new ApiError(400, 'NOTICE_REQUIRED', 'Devam etmek için Aydınlatma Metni\'ni okuduğunu işaretle.');
+    }
+    const marketingEmail = body.marketingEmail === true;
     const email = parseEmail(body.email);
     const password = parsePassword(body.password);
     const name = typeof body.name === 'string' ? body.name.trim() : '';
@@ -84,10 +93,20 @@ export class AuthService {
       return;
     }
     const hash = await argon2.hash(password, { type: argon2.argon2id });
-    const user = await this.db.one<{ id: string }>(
-      'INSERT INTO users (email, name, password_hash, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING RETURNING id',
-      [email, name, hash, this.now()],
-    );
+    const now = this.now();
+    const user = await this.db.tx(async (c) => {
+      const u = (
+        await c.query<{ id: string }>(
+          'INSERT INTO users (email, name, password_hash, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING RETURNING id',
+          [email, name, hash, now],
+        )
+      ).rows[0];
+      if (!u) return undefined;
+      // Aydınlatma metninin hangi sürümü gösterildi; kampanya izni yalnız işaretlendiyse.
+      await recordAcknowledgement(c, u.id, 'aydinlatma', noticeVersion, null, meta, now);
+      if (marketingEmail) await recordMarketingConsent(c, u.id, true, 'register', meta, now);
+      return u;
+    });
     if (!user) return; // aynı anda iki kayıt: ikincisi sessizce biter
     const token = await this.issueEmailToken(user.id, 'verify_email', VERIFY_TTL_MS);
     await this.deps.mailer.send(mails.verifyEmail(email, name, `${origin}/dogrula?token=${token}`));
@@ -107,11 +126,13 @@ export class AuthService {
     return row.user_id;
   }
 
+  @SystemScope()
   async verifyEmail(body: Record<string, unknown>): Promise<void> {
     const userId = await this.consumeToken(body.token, 'verify_email');
     await this.db.query('UPDATE users SET email_verified_at = COALESCE(email_verified_at, $2) WHERE id = $1', [userId, this.now()]);
   }
 
+  @SystemScope()
   async login(body: Record<string, unknown>): Promise<{ user: PublicUser; sessionToken: string }> {
     const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
     const password = typeof body.password === 'string' ? body.password : '';
@@ -152,11 +173,13 @@ export class AuthService {
     return { user: toPublic(user), sessionToken };
   }
 
+  @SystemScope()
   async logout(sessionToken: string | undefined): Promise<void> {
     if (!sessionToken) return;
     await this.db.query('DELETE FROM sessions WHERE token_hash = $1', [hashToken(sessionToken)]);
   }
 
+  @SystemScope()
   async userFromSession(sessionToken: string | undefined): Promise<PublicUser | null> {
     if (!sessionToken || sessionToken.length > 200) return null;
     const row = await this.db.one(
@@ -167,6 +190,7 @@ export class AuthService {
     return row ? toPublic(row) : null;
   }
 
+  @SystemScope()
   async forgotPassword(body: Record<string, unknown>): Promise<void> {
     const r = emailSchema.safeParse(body.email);
     if (!r.success) return; // yanıt her durumda aynı
@@ -176,6 +200,7 @@ export class AuthService {
     await this.deps.mailer.send(mails.resetPassword(r.data, `${this.deps.config.webOrigin}/sifre-sifirla?token=${token}`));
   }
 
+  @SystemScope()
   async resetPassword(body: Record<string, unknown>): Promise<void> {
     const password = parsePassword(body.password);
     const userId = await this.consumeToken(body.token, 'reset_password');

@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { PoolClient } from 'pg';
 import { MINUTE } from '../common/clock';
+import { SystemScope } from '../db/scope';
 import { DEPS, type AppDeps } from '../deps';
 import { mails } from '../mail/templates';
 
@@ -31,6 +32,7 @@ export class JobsService {
   constructor(@Inject(DEPS) private readonly deps: AppDeps) {}
 
   /** Zamanı gelmiş işleri bir tur işler. `ignoreSchedule` testler içindir. */
+  @SystemScope()
   async runDue(opts: { ignoreSchedule?: boolean } = {}): Promise<void> {
     if (this.running) return;
     this.running = true;

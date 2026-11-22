@@ -9,6 +9,7 @@ import { OrdersService } from './orders/orders.service';
 import { AccountService } from './billing/account.service';
 import { WebhooksService } from './billing/webhooks.service';
 import { JobsService } from './jobs/jobs.service';
+import { ConsentsService } from './legal/consents.service';
 import { AccountController, AuthController, DevPaymentsController, WebhooksController } from './controllers';
 
 @Module({})
@@ -17,7 +18,7 @@ class AppModule {
     return {
       module: AppModule,
       controllers: [AuthController, AccountController, WebhooksController, DevPaymentsController],
-      providers: [{ provide: DEPS, useValue: deps }, AuthService, OrdersService, AccountService, WebhooksService, JobsService],
+      providers: [{ provide: DEPS, useValue: deps }, AuthService, OrdersService, AccountService, WebhooksService, JobsService, ConsentsService],
     };
   }
 }

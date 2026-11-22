@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { Body, Controller, Get, HttpCode, Inject, Param, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Param, Post, Put, Req, Res } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { DAY } from './common/clock';
 import { ApiError, notFound, unauthenticated } from './common/errors';
@@ -10,6 +10,8 @@ import { OrdersService } from './orders/orders.service';
 import { AccountService } from './billing/account.service';
 import { WebhooksService } from './billing/webhooks.service';
 import { FakePaymentProvider } from './payments/provider';
+import { LEGAL_DOCUMENTS, requestMeta } from './legal/documents';
+import { ConsentsService } from './legal/consents.service';
 
 export function readCookie(req: FastifyRequest, name: string): string | undefined {
   const header = req.headers.cookie;
@@ -25,11 +27,19 @@ export function readCookie(req: FastifyRequest, name: string): string | undefine
 const body = (b: unknown): Record<string, unknown> => (b && typeof b === 'object' ? (b as Record<string, unknown>) : {});
 
 abstract class WithSession {
-  constructor(protected readonly auth: AuthService) {}
+  constructor(
+    protected readonly auth: AuthService,
+    protected readonly db: AppDeps['db'],
+  ) {}
   protected async user(req: FastifyRequest): Promise<PublicUser> {
     const u = await this.auth.userFromSession(readCookie(req, SESSION_COOKIE));
     if (!u) throw unauthenticated();
     return u;
+  }
+  /** Oturumu doğrular, `fn` içindeki bütün sorguları bu üye adına (RLS) çalıştırır. */
+  protected async as<T>(req: FastifyRequest, fn: (user: PublicUser) => Promise<T>): Promise<T> {
+    const u = await this.user(req);
+    return this.db.asUser(u.id, () => fn(u));
   }
 }
 
@@ -47,8 +57,8 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(202)
-  async register(@Body() b: unknown) {
-    await this.auth.register(body(b));
+  async register(@Req() req: FastifyRequest, @Body() b: unknown) {
+    await this.auth.register(body(b), requestMeta(req));
     return { ok: true };
   }
 
@@ -95,9 +105,10 @@ export class AccountController extends WithSession {
     @Inject(AuthService) auth: AuthService,
     @Inject(OrdersService) private readonly orders: OrdersService,
     @Inject(AccountService) private readonly account: AccountService,
+    @Inject(ConsentsService) private readonly consents: ConsentsService,
     @Inject(DEPS) private readonly deps: AppDeps,
   ) {
-    super(auth);
+    super(auth, deps.db);
   }
 
   @Get('me')
@@ -110,52 +121,73 @@ export class AccountController extends WithSession {
     return publicPlans(this.deps.config.planPrices);
   }
 
+  @Get('legal')
+  legal() {
+    return LEGAL_DOCUMENTS;
+  }
+
+  @Get('me/consents')
+  async getConsents(@Req() req: FastifyRequest) {
+    return this.as(req, (u) => this.consents.get(u));
+  }
+
+  @Put('me/consents')
+  @HttpCode(200)
+  async putConsents(@Req() req: FastifyRequest, @Body() b: unknown) {
+    return this.as(req, (u) => this.consents.update(u, body(b), requestMeta(req)));
+  }
+
+  @Get('me/legal')
+  async myLegal(@Req() req: FastifyRequest) {
+    return this.as(req, (u) => this.consents.acknowledgements(u));
+  }
+
   @Post('checkout')
   @HttpCode(201)
   async checkout(@Req() req: FastifyRequest, @Body() b: unknown) {
-    return this.orders.checkout(await this.user(req), body(b));
+    return this.as(req, (u) => this.orders.checkout(u, body(b), requestMeta(req)));
   }
 
   @Get('orders/:id')
   async order(@Req() req: FastifyRequest, @Param('id') id: string) {
-    return this.orders.get(await this.user(req), id);
+    return this.as(req, (u) => this.orders.get(u, id));
   }
 
   @Get('subscriptions')
   async subscriptions(@Req() req: FastifyRequest) {
-    return this.account.subscriptions(await this.user(req));
+    return this.as(req, (u) => this.account.subscriptions(u));
   }
 
   @Post('subscriptions/:id/cancel')
   @HttpCode(200)
   async cancel(@Req() req: FastifyRequest, @Param('id') id: string) {
-    return this.account.cancelSubscription(await this.user(req), id);
+    return this.as(req, (u) => this.account.cancelSubscription(u, id));
   }
 
   @Get('invoices')
   async invoices(@Req() req: FastifyRequest) {
-    return this.account.invoices(await this.user(req));
+    return this.as(req, (u) => this.account.invoices(u));
   }
 
   @Get('invoices/:id')
   async invoice(@Req() req: FastifyRequest, @Param('id') id: string) {
-    return this.account.invoice(await this.user(req), id);
+    return this.as(req, (u) => this.account.invoice(u, id));
   }
 
   @Post('tickets')
   @HttpCode(201)
   async createTicket(@Req() req: FastifyRequest, @Body() b: unknown) {
-    return this.account.createTicket(await this.user(req), body(b));
+    return this.as(req, (u) => this.account.createTicket(u, body(b)));
   }
 
   @Get('tickets')
   async tickets(@Req() req: FastifyRequest) {
-    return this.account.tickets(await this.user(req));
+    return this.as(req, (u) => this.account.tickets(u));
   }
 
   @Get('tickets/:id')
   async ticket(@Req() req: FastifyRequest, @Param('id') id: string) {
-    return this.account.ticket(await this.user(req), id);
+    return this.as(req, (u) => this.account.ticket(u, id));
   }
 }
 
@@ -184,7 +216,7 @@ export class DevPaymentsController extends WithSession {
     @Inject(WebhooksService) private readonly webhooks: WebhooksService,
     @Inject(DEPS) private readonly deps: AppDeps,
   ) {
-    super(auth);
+    super(auth, deps.db);
   }
 
   @Post(':orderId/:result')
@@ -193,7 +225,7 @@ export class DevPaymentsController extends WithSession {
     const provider = this.deps.payments;
     if (!this.deps.config.devPaymentsEnabled || !(provider instanceof FakePaymentProvider)) throw notFound();
     if (result !== 'basarili' && result !== 'basarisiz') throw notFound();
-    const order = await this.orders.get(await this.user(req), orderId);
+    const order = await this.as(req, (u) => this.orders.get(u, orderId));
     if (order.status !== 'pending' && order.status !== 'failed') {
       throw new ApiError(409, 'ALREADY_PROCESSED', 'Bu sipariş zaten işlenmiş.');
     }
@@ -207,6 +239,6 @@ export class DevPaymentsController extends WithSession {
       periodEnd: new Date(now.getTime() + 30 * DAY).toISOString(),
     });
     await this.webhooks.handle(signed.body, signed.headers);
-    return this.orders.get(await this.user(req), orderId);
+    return this.as(req, (u) => this.orders.get(u, orderId));
   }
 }

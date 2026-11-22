@@ -4,6 +4,10 @@ import { ApiError, notFound } from '../common/errors';
 import { DEPS, type AppDeps } from '../deps';
 import type { PublicUser } from '../auth/auth.service';
 import { findPlan, toPublic } from '../catalog/plans';
+import { withSystemScope } from '../db/db';
+import { currentVersion, type RequestMeta } from '../legal/documents';
+import { recordAcknowledgement } from '../legal/consents.service';
+import { mails } from '../mail/templates';
 
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$/;
 export const RESERVED_SLUGS = new Set(['www', 'api', 'admin', 'panel', 'destek', 'mail', 'app', 'moonvalesoft']);
@@ -36,7 +40,7 @@ function view(r: any): OrderView {
 export class OrdersService {
   constructor(@Inject(DEPS) private readonly deps: AppDeps) {}
 
-  async checkout(user: PublicUser, body: Record<string, unknown>) {
+  async checkout(user: PublicUser, body: Record<string, unknown>, meta: RequestMeta = { ip: null, userAgent: null }) {
     if (!user.emailVerified) {
       throw new ApiError(403, 'EMAIL_NOT_VERIFIED', 'Satın almadan önce e-posta adresini doğrulamalısın.');
     }
@@ -70,6 +74,17 @@ export class OrdersService {
       }
     }
 
+    // Ön bilgilendirme ve mesafeli satış sözleşmesi, gösterilen sürümüyle onaylanmadan sipariş açılmaz.
+    const preInfoVersion = currentVersion('on_bilgilendirme');
+    const distanceSalesVersion = currentVersion('mesafeli_satis');
+    if (body.preInfoVersion !== preInfoVersion || body.distanceSalesVersion !== distanceSalesVersion) {
+      throw new ApiError(
+        400,
+        'LEGAL_ACCEPTANCE_REQUIRED',
+        'Ödemeye geçmeden önce Ön Bilgilendirme Formu\'nu ve Mesafeli Satış Sözleşmesi\'ni onaylamalısın.',
+      );
+    }
+
     const amountKurus = pub.priceKurus * seats;
     const now = this.deps.clock.now();
 
@@ -77,7 +92,8 @@ export class OrdersService {
       if (slug) {
         // Aynı slug'a aynı anda iki sipariş gelmesin.
         await c.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`slug:${slug}`]);
-        if (RESERVED_SLUGS.has(slug) || (await this.slugTaken(c, slug, user.id, now))) {
+        // Adres çakışması bütün siparişlere bakar: bu tek sorgu sistem bağlamında çalışır.
+        if (RESERVED_SLUGS.has(slug) || (await withSystemScope(c, () => this.slugTaken(c, slug!, user.id, now)))) {
           throw new ApiError(409, 'SLUG_TAKEN', 'Bu adres alınmış. Başka bir adres dene.');
         }
       }
@@ -86,7 +102,10 @@ export class OrdersService {
          VALUES ($1, $2, $3, $4, 'pending', $5, $6, $7) RETURNING *`,
         [user.id, plan.id, seats, amountKurus, slug, companyName, now],
       );
-      return r.rows[0];
+      const created = r.rows[0];
+      await recordAcknowledgement(c, user.id, 'on_bilgilendirme', preInfoVersion, created.id, meta, now);
+      await recordAcknowledgement(c, user.id, 'mesafeli_satis', distanceSalesVersion, created.id, meta, now);
+      return created;
     });
 
     const { checkoutUrl } = await this.deps.payments.createCheckout({
@@ -95,6 +114,18 @@ export class OrdersService {
       planId: plan.id,
       customerEmail: user.email,
     });
+    const origin = this.deps.config.webOrigin;
+    await this.deps.mailer
+      .send(
+        mails.preInfo(user.email, user.name, {
+          planName: pub.name,
+          seats,
+          amountKurus,
+          preInfoUrl: `${origin}/on-bilgilendirme?surum=${preInfoVersion}`,
+          distanceSalesUrl: `${origin}/mesafeli-satis?surum=${distanceSalesVersion}`,
+        }),
+      )
+      .catch(() => undefined);
     return { orderId: order.id as string, checkoutUrl, amountKurus };
   }
 

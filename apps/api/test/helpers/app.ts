@@ -5,7 +5,8 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { createApp } from '../../src/app';
 import type { Config } from '../../src/config';
 import { FakeClock } from '../../src/common/clock';
-import { Db } from '../../src/db/db';
+import { Db, type DbScope } from '../../src/db/db';
+import { currentVersion } from '../../src/legal/documents';
 import { InMemoryMailer, type SentMail } from '../../src/mail/mailer';
 import { FakePaymentProvider, type PaymentEvent } from '../../src/payments/provider';
 import { FakeProvisioner, type ProvisionerCall } from '../../src/provisioning/provisioner';
@@ -44,8 +45,19 @@ export interface TestApp {
   clock: { advance(ms: number): void; now(): Date };
   registerAndLogin(email?: string, password?: string): Promise<{ cookie: string; user: any; password: string }>;
   config: Config;
+  /** Sorguyu uygulamanın gerçek rolü (mv_app) ve verilen bağlamla çalıştırır (RLS testleri için). */
+  sql(text: string, params?: unknown[], scope?: DbScope): Promise<any[]>;
+  /** Sorguyu süper kullanıcıyla çalıştırır (katalog sorguları, RLS'i atlayarak kontrol). */
+  adminSql(text: string, params?: unknown[]): Promise<any[]>;
   close(): Promise<void>;
 }
+
+/** Yürürlükteki yasal belge sürümleri: kayıt ve satın alma isteklerinde gönderilir. */
+export const LEGAL = {
+  notice: currentVersion('aydinlatma'),
+  preInfo: currentVersion('on_bilgilendirme'),
+  distanceSales: currentVersion('mesafeli_satis'),
+};
 
 export interface TestAppOptions {
   planPrices?: Record<string, number>;
@@ -115,7 +127,7 @@ export async function createTestApp(opts: TestAppOptions = {}): Promise<TestApp>
 
   async function registerAndLogin(email?: string, password = 'cok-gizli-sifre-123') {
     const mail = email ?? `uye-${randomBytes(4).toString('hex')}@ornek.test`;
-    const reg = await request({ method: 'POST', url: '/api/auth/register', body: { email: mail, password, name: 'Test Üye' } });
+    const reg = await request({ method: 'POST', url: '/api/auth/register', body: { email: mail, password, name: 'Test Üye', noticeVersion: LEGAL.notice } });
     if (reg.status !== 202) throw new Error(`kayıt başarısız: ${reg.status}`);
     const verifyMail = [...mailer.sent].reverse().find((m) => m.to === mail.toLowerCase());
     const link = verifyMail?.links.find((l) => l.includes('/dogrula?token='));
@@ -137,6 +149,18 @@ export async function createTestApp(opts: TestAppOptions = {}): Promise<TestApp>
     clock,
     registerAndLogin,
     config,
+    async sql(text, params = [], scope = 'none') {
+      return (await db.tx((c) => c.query(text, params), scope)).rows;
+    },
+    async adminSql(text, params = []) {
+      const a = new Client({ connectionString: config.databaseUrl });
+      await a.connect();
+      try {
+        return (await a.query(text, params)).rows;
+      } finally {
+        await a.end();
+      }
+    },
     async close() {
       await app.close();
       await db.close();
