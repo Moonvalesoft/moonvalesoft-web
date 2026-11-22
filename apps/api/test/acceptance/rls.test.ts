@@ -4,6 +4,8 @@
  * Bütün veriler sentetiktir.
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { Client } from 'pg';
+import { TEST_ROLE_PASSWORDS } from '../helpers/global-setup';
 import {
   createTestApp,
   type TestApp,
@@ -78,6 +80,7 @@ describe('RLS kataloğu', () => {
       'jobs',
       'legal_acknowledgements',
       'marketing_consents',
+      'rate_limit_hits',
     ]) {
       expect(tables).toContain(name);
     }
@@ -99,10 +102,26 @@ describe('RLS kataloğu', () => {
     expect(rows).toEqual([{ rolsuper: false, rolbypassrls: false, rolcanlogin: false }]);
   });
 
-  it("mv_app hiçbir tablonun sahibi değildir (sahip RLS'ten muaf olmasın)", async () => {
+  it('uygulama mv_api kullanıcısıyla bağlanır: session_user = mv_api', async () => {
+    for (const scope of ['none', 'system', asA()] as Scope[]) {
+      const rows = await t.sql('SELECT session_user AS s, current_user AS u', [], scope);
+      expect(rows[0]).toEqual({ s: 'mv_api', u: 'mv_app' });
+    }
+  });
+
+  it('mv_api: süper kullanıcı değil, BYPASSRLS yok, rol oluşturamaz, mv_app üyesi', async () => {
+    const rows = await t.adminSql(
+      `SELECT rolsuper, rolbypassrls, rolcreaterole, rolcreatedb, pg_has_role('mv_api', 'mv_app', 'MEMBER') AS member
+         FROM pg_roles WHERE rolname = 'mv_api'`,
+    );
+    expect(rows).toEqual([{ rolsuper: false, rolbypassrls: false, rolcreaterole: false, rolcreatedb: false, member: true }]);
+  });
+
+  it.each(['mv_api', 'mv_app'])('%s hiçbir public tablonun sahibi değildir', async (role) => {
     const rows = await t.adminSql(
       `SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-        WHERE n.nspname = 'public' AND c.relkind IN ('r', 'p') AND pg_get_userbyid(c.relowner) = 'mv_app'`,
+        WHERE n.nspname = 'public' AND c.relkind IN ('r', 'p') AND pg_get_userbyid(c.relowner) = $1`,
+      [role],
     );
     expect(rows).toEqual([]);
   });
@@ -187,15 +206,49 @@ describe("üye bağlamı (A): WHERE yazmadan B'nin satırı görünmez", () => {
     expect(await t.sql(`SELECT * FROM ${name}`, [], asA())).toEqual([]);
   });
 
-  it("email_tokens: B'nin token'ı görünmez", async () => {
-    const rows = await t.sql('SELECT user_id FROM email_tokens', [], asA());
-    expect(rows.every((r) => r.user_id === A.userId)).toBe(true);
+  it('email_tokens: üye bağlamında SELECT 0 satır (kendi token özetleri dahil)', async () => {
+    const own = await t.adminSql('SELECT count(*)::int AS n FROM email_tokens WHERE user_id = $1', [A.userId]);
+    expect(own[0].n).toBeGreaterThan(0);
+    expect(await t.sql('SELECT * FROM email_tokens', [], asA())).toEqual([]);
   });
 
-  it("A bağlamında toplu UPDATE B'nin aboneliğine dokunmaz", async () => {
-    const rows = await t.sql('UPDATE subscriptions SET seats = seats RETURNING user_id', [], asA());
-    expect(rows.length).toBeGreaterThan(0);
-    expect(rows.every((r) => r.user_id === A.userId)).toBe(true);
+  it("A bağlamında toplu UPDATE hiçbir aboneliği değiştirmez (kendi satırı dahil; üye UPDATE politikası yok)", async () => {
+    const before = await t.adminSql('SELECT id, cancel_at_period_end, seats FROM subscriptions ORDER BY id');
+    const rows = await t.sql('UPDATE subscriptions SET cancel_at_period_end = true, seats = seats + 1 RETURNING id', [], asA());
+    expect(rows).toEqual([]);
+    expect(await t.adminSql('SELECT id, cancel_at_period_end, seats FROM subscriptions ORDER BY id')).toEqual(before);
+  });
+
+  it("mv_request_cancel: B'nin aboneliğine dokunmaz (null döner)", async () => {
+    const bSub = (await t.adminSql('SELECT * FROM subscriptions WHERE user_id = $1', [B.userId]))[0];
+    expect(bSub.cancel_at_period_end).toBe(false);
+    const r = await t.sql('SELECT mv_request_cancel($1) AS ok', [bSub.id], asA());
+    expect(r[0].ok).toBeNull();
+    expect((await t.adminSql('SELECT * FROM subscriptions WHERE id = $1', [bSub.id]))[0]).toEqual(bSub);
+  });
+
+  it('mv_request_cancel: bağlamsız çağrı hiçbir şey değiştirmez', async () => {
+    const bSub = (await t.adminSql('SELECT * FROM subscriptions WHERE user_id = $1', [B.userId]))[0];
+    const r = await t.sql('SELECT mv_request_cancel($1) AS ok', [bSub.id], 'none');
+    expect(r[0].ok).toBeNull();
+    expect((await t.adminSql('SELECT * FROM subscriptions WHERE id = $1', [bSub.id]))[0]).toEqual(bSub);
+  });
+
+  it('mv_request_cancel: kendi aboneliğinde yalnız cancel_at_period_end değişir', async () => {
+    const before = (await t.adminSql('SELECT * FROM subscriptions WHERE user_id = $1', [A.userId]))[0];
+    const bBefore = await t.adminSql('SELECT * FROM subscriptions WHERE user_id = $1', [B.userId]);
+    expect(before.cancel_at_period_end).toBe(false);
+    const r = await t.sql('SELECT mv_request_cancel($1) AS ok', [before.id], asA());
+    expect(r[0].ok).toBe(true);
+    const after = (await t.adminSql('SELECT * FROM subscriptions WHERE id = $1', [before.id]))[0];
+    expect(after).toEqual({ ...before, cancel_at_period_end: true });
+    expect(await t.adminSql('SELECT * FROM subscriptions WHERE user_id = $1', [B.userId])).toEqual(bBefore);
+  });
+
+  it('users: üye bağlamında UPDATE 0 satır (kendi satırı dahil)', async () => {
+    const before = await t.adminSql('SELECT id, name, email FROM users ORDER BY id');
+    expect(await t.sql("UPDATE users SET name = 'Oynanmis Ad' RETURNING id", [], asA())).toEqual([]);
+    expect(await t.adminSql('SELECT id, name, email FROM users ORDER BY id')).toEqual(before);
   });
 
   it("A bağlamında toplu DELETE B'nin oturumunu silmez", async () => {
@@ -292,5 +345,74 @@ describe('sistem bağlamı', () => {
     const ids = rows.map((r) => r.user_id);
     expect(ids).toContain(A.userId);
     expect(ids).toContain(B.userId);
+  });
+});
+
+describe('KVKK kayıt tabloları: tetikleyiciyle yalnız eklemeye açık', () => {
+  const kvkk = ['legal_acknowledgements', 'marketing_consents'] as const;
+  const setFor = (table: string) => (table === 'legal_acknowledgements' ? "version = 'oynanmis'" : 'granted = NOT granted');
+
+  /** Tablo sahibi (migration kullanıcısı) olarak sorgu: sahiplik ve BYPASSRLS de korumayı aşmamalı. */
+  async function asOwner(text: string): Promise<void> {
+    const u = new URL(t.config.databaseUrl);
+    u.username = 'mv_migrator';
+    u.password = TEST_ROLE_PASSWORDS.migrator;
+    const c = new Client({ connectionString: u.toString() });
+    await c.connect();
+    try {
+      await c.query(text);
+    } finally {
+      await c.end();
+    }
+  }
+
+  async function snapshot(table: string) {
+    return t.adminSql(`SELECT * FROM ${table} ORDER BY id`);
+  }
+
+  it('adminSql gerçekten süper kullanıcıdır; mv_migrator tabloların sahibidir (test anlamlı)', async () => {
+    const r = await t.adminSql('SELECT rolsuper FROM pg_roles WHERE rolname = current_user');
+    expect(r[0].rolsuper).toBe(true);
+    const owners = await t.adminSql(
+      `SELECT DISTINCT pg_get_userbyid(relowner) AS o FROM pg_class WHERE relname = ANY($1)`,
+      [[...kvkk]],
+    );
+    expect(owners).toEqual([{ o: 'mv_migrator' }]);
+  });
+
+  it.each(kvkk)('%s: süper kullanıcıyla UPDATE, DELETE, TRUNCATE hata verir; veri değişmez', async (table) => {
+    const before = await snapshot(table);
+    expect(before.length).toBeGreaterThan(0);
+    await expect(t.adminSql(`UPDATE ${table} SET ${setFor(table)}`)).rejects.toThrow(/yalnız eklemeye açık/);
+    await expect(t.adminSql(`DELETE FROM ${table}`)).rejects.toThrow(/yalnız eklemeye açık/);
+    await expect(t.adminSql(`TRUNCATE ${table}`)).rejects.toThrow(/yalnız eklemeye açık/);
+    expect(await snapshot(table)).toEqual(before);
+  });
+
+  it.each(kvkk)('%s: tablo sahibi (mv_migrator) ile UPDATE, DELETE, TRUNCATE hata verir', async (table) => {
+    const before = await snapshot(table);
+    await expect(asOwner(`UPDATE ${table} SET ${setFor(table)}`)).rejects.toThrow(/yalnız eklemeye açık/);
+    await expect(asOwner(`DELETE FROM ${table}`)).rejects.toThrow(/yalnız eklemeye açık/);
+    await expect(asOwner(`TRUNCATE ${table}`)).rejects.toThrow(/yalnız eklemeye açık/);
+    expect(await snapshot(table)).toEqual(before);
+  });
+
+  it.each(kvkk)('%s: ekleme hâlâ çalışır (sistem bağlamı)', async (table) => {
+    const n = (await snapshot(table)).length;
+    if (table === 'legal_acknowledgements') {
+      await t.sql(
+        `INSERT INTO legal_acknowledgements (user_id, document, version, accepted_at) VALUES ($1, 'aydinlatma', 'taslak-1', now())`,
+        [A.userId],
+        'system',
+      );
+    } else {
+      await t.sql(
+        `INSERT INTO marketing_consents (user_id, channel, granted, text_version, source, created_at)
+         VALUES ($1, 'email', false, 'taslak-1', 'panel', now())`,
+        [A.userId],
+        'system',
+      );
+    }
+    expect((await snapshot(table)).length).toBe(n + 1);
   });
 });
