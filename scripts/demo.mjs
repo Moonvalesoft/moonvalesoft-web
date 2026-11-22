@@ -12,7 +12,7 @@
  *   DEMO_PLAN_PRICES="randevu-aylik=100000" npm run demo   (kuruş; 100000 = 1.000 TL)
  */
 import { spawn } from 'node:child_process';
-import { chmodSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -27,14 +27,25 @@ const PORT = 54329;
 const DB = 'moonvale_demo';
 const PW = { admin: 'demo', migrator: 'mv_migrator_demo', api: 'mv_api_demo' };
 const dataDir = join(root, '.demo', 'pgdata');
-const fresh = !existsSync(dataDir);
+// Yarıda kalmış bir kurulum (PG_VERSION yok) baştan yapılır.
+const fresh = !existsSync(join(dataDir, 'PG_VERSION'));
+if (fresh) rmSync(dataDir, { recursive: true, force: true });
 mkdirSync(join(root, '.demo'), { recursive: true });
 // Linux'ta root olarak çalışırken PostgreSQL ayrı kullanıcıya geçer; klasöre yazabilsin.
 if (process.getuid?.() === 0) chmodSync(join(root, '.demo'), 0o777);
 
 const say = (m) => console.log(`\x1b[33m[demo]\x1b[0m ${m}`);
 
-const server = new EmbeddedPostgres({ databaseDir: dataDir, user: 'postgres', password: PW.admin, port: PORT, persistent: true, onLog: () => {} });
+// Bölge ayarı sabit: Windows'ta "Turkish_Türkiye.1254" gibi ASCII olmayan adları initdb kabul etmiyor.
+const server = new EmbeddedPostgres({
+  databaseDir: dataDir,
+  user: 'postgres',
+  password: PW.admin,
+  port: PORT,
+  persistent: true,
+  initdbFlags: ['--encoding=UTF8', '--locale=C', '--lc-messages=C'],
+  onLog: () => {},
+});
 if (fresh) {
   say('Veritabanı ilk kez hazırlanıyor (bir dakika sürebilir)…');
   await server.initialise();
