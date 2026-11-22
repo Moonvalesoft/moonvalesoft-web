@@ -45,7 +45,8 @@ export class AccountService {
     if (sub.status === 'canceled') throw new ApiError(409, 'ALREADY_CANCELED', 'Bu abonelik zaten iptal edilmiş.');
     if (!sub.cancel_at_period_end) {
       await this.deps.payments.cancelSubscription(sub.order_id);
-      await this.deps.db.query('UPDATE subscriptions SET cancel_at_period_end = true WHERE id = $1', [id]);
+      // Üye bağlamında subscriptions'a UPDATE politikası yok; yalnız bu sütunu değiştiren fonksiyon var.
+      await this.deps.db.query('SELECT mv_request_cancel($1)', [id]);
     }
     return subView({ ...sub, cancel_at_period_end: true });
   }

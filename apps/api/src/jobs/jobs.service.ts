@@ -6,6 +6,7 @@ import { DEPS, type AppDeps } from '../deps';
 import { mails } from '../mail/templates';
 
 export const MAX_ATTEMPTS = 5;
+const CLEANUP_AFTER_MS = 24 * 60 * MINUTE;
 
 export type JobKind = 'create_tenant' | 'freeze_tenant';
 
@@ -43,9 +44,20 @@ export class JobsService {
         [opts.ignoreSchedule === true, now],
       );
       for (const job of due.rows) await this.runOne(job);
+      await this.cleanup(now);
     } finally {
       this.running = false;
     }
+  }
+
+  /**
+   * İstek sınırı ve hatalı giriş kayıtları en fazla 1 saatlik pencerelerde sayılır; 1 günden eskileri silinir
+   * (tablo süresiz büyümesin, e-posta ve IP gereğinden uzun tutulmasın).
+   */
+  private async cleanup(now: Date) {
+    const before = new Date(now.getTime() - CLEANUP_AFTER_MS);
+    await this.deps.db.query('DELETE FROM rate_limit_hits WHERE at < $1', [before]);
+    await this.deps.db.query('DELETE FROM login_failures WHERE at < $1', [before]);
   }
 
   private async runOne(job: any) {
@@ -53,6 +65,7 @@ export class JobsService {
     try {
       if (job.kind === 'create_tenant') {
         await this.deps.provisioner.createTenant({
+          subscriptionId: p.subscriptionId,
           slug: p.slug,
           companyName: p.companyName,
           ownerEmail: p.ownerEmail,

@@ -184,3 +184,35 @@ Her `createTestApp` boş bir veritabanıyla başlar.
     - Bütün kimlikler UUID'dir.
 13. `t.runJobs()` her turda zamanı gelmiş (bekleme süresi yok sayılır) her işi **bir kez** dener.
 14. Bilinmeyen `orderId`'li olay kaydedilir ama dışarıdan görünen bir etkisi yoktur.
+
+## Güvenlik düzeltmeleri (22 Kasım 2026, güvenlik incelemesi)
+
+**İstek sınırları** (`rate_limit_hits`, kayan pencere; değerler `config.rateLimits`, testte `createTestApp({ rateLimits })` ile verilir):
+
+| Uç | Sınır | Aşılınca |
+| --- | --- | --- |
+| `POST /api/auth/register` | IP başına saatte 10 | `429 TOO_MANY_REQUESTS` (aydınlatma ve alan doğrulamasından sonra) |
+| `POST /api/auth/forgot-password` | IP başına saatte 20 | `429 TOO_MANY_REQUESTS` |
+| `POST /api/auth/forgot-password` | e-posta başına saatte 3 | yanıt yine `202`, e-posta **gönderilmez** (hesap varlığı sızmasın) |
+| `POST /api/auth/login` | IP başına 15 dakikada 50 deneme | `429 TOO_MANY_REQUESTS` |
+| `POST /api/auth/login` | e-posta başına 15 dakikada 5 hatalı | `429 TOO_MANY_ATTEMPTS` (değişmedi; artık paralel isteklerle aşılamaz) |
+
+- Giriş denemesi önce hatalı sayılır, şifre doğruysa o kayıt silinir. Şifresi doğru ama e-postası doğrulanmamış giriş (`403`) hatalı sayılmaz.
+- Kayıt ve şifre sıfırlamada e-posta beklenmeden gönderilir; kayıtta şifre her durumda hash'lenir (süre farkı olmasın).
+- Doğrulama e-postasında kullanıcının yazdığı ad yer almaz ("Merhaba,").
+
+**IP:** `req.ip` yalnız `TRUSTED_PROXIES` adreslerinden gelen `X-Forwarded-For`'u dikkate alır. Testte güvenilen adres `127.0.0.1,::1`.
+
+**Veritabanı kullanıcıları** (`apps/api/db/roles.sql`): migration `mv_migrator` (tablo sahibi, BYPASSRLS) ile, uygulama `mv_api` (süper kullanıcı değil, BYPASSRLS yok, hiçbir tablonun sahibi değil, `mv_app` üyesi) ile çalışır. Testler de böyle bağlanır. API, üretimde bu koşullar sağlanmazsa açılmaz.
+
+**KVKK kayıtları:** `legal_acknowledgements` ve `marketing_consents` tetikleyiciyle korunur: tablo sahibi dahil UPDATE, DELETE, TRUNCATE hata verir.
+
+**Daraltılmış politikalar:** üye bağlamında `users` UPDATE, `email_tokens` SELECT ve `subscriptions` UPDATE yok. İptal isteği yalnız `mv_request_cancel(id)` fonksiyonuyla ve yalnız `cancel_at_period_end` sütununu değiştirir.
+
+**Adres çakışması:** ödeme kesinleşirken aynı adres kurulumu başlamış başka bir aboneliğe aitse firma açılmaz, abonelik `provisioning: failed` olur, Ozan'a "Adres çakışması" e-postası gider. (İade mi, yeni adres mi: Ozan karar verecek.)
+
+**Randevu firma açma sözleşmesi** (Randevu tarafında yazılacak): `POST /internal/tenants`, başlık `Idempotency-Key: create:<subscriptionId>`, gövdede `subscriptionId`. Aynı anahtar tekrar gelirse `200`. `409` = adres başka aboneliğe ait → **hata** sayılır (önceden başarılı sayılıyordu). Dondurmada `409` (zaten dondurulmuş) başarılıdır.
+
+**Sahte ödeme:** API ucu yalnız `DEV_FAKE_PAYMENTS=true` ve üretim dışıyken açık; web'deki `/test-odeme` yalnız `next dev` ve `NEXT_PUBLIC_DEV_FAKE_PAYMENTS=true` iken var.
+
+**Ayrılmış adresler** genişledi (bkz. `RESERVED_SLUGS`).

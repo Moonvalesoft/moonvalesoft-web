@@ -11,7 +11,7 @@ import { InMemoryMailer, type SentMail } from '../../src/mail/mailer';
 import { FakePaymentProvider, type PaymentEvent } from '../../src/payments/provider';
 import { FakeProvisioner, type ProvisionerCall } from '../../src/provisioning/provisioner';
 import { JobsService } from '../../src/jobs/jobs.service';
-import { TEMPLATE_DB } from './global-setup';
+import { TEMPLATE_DB, TEST_ROLE_PASSWORDS } from './global-setup';
 
 export const TEST_WEB_ORIGIN = 'http://localhost:3000';
 export const TEST_ADMIN_EMAIL = 'ozan@moonvalesoft.test';
@@ -62,6 +62,11 @@ export const LEGAL = {
 export interface TestAppOptions {
   planPrices?: Record<string, number>;
   adminEmail?: string;
+  rateLimits?: Partial<Config['rateLimits']>;
+  /** X-Forwarded-For'a güvenilecek adresler; '' = hiçbirine. Varsayılan '127.0.0.1,::1'. */
+  trustedProxies?: string;
+  /** Sahte ödeme ucu açık mı. Varsayılan true. */
+  devPaymentsEnabled?: boolean;
 }
 
 const WEBHOOK_SECRET = 'test-webhook-secret-test-webhook-secret';
@@ -75,6 +80,10 @@ export async function createTestApp(opts: TestAppOptions = {}): Promise<TestApp>
   await admin.end();
   const u = new URL(adminUrl);
   u.pathname = `/${dbName}`;
+  const adminDbUrl = u.toString();
+  // Uygulama üretimdeki gibi mv_api ile bağlanır: süper kullanıcı değil, tablo sahibi değil.
+  u.username = 'mv_api';
+  u.password = TEST_ROLE_PASSWORDS.api;
 
   const config: Config = {
     databaseUrl: u.toString(),
@@ -89,7 +98,11 @@ export async function createTestApp(opts: TestAppOptions = {}): Promise<TestApp>
     adminEmail: opts.adminEmail ?? TEST_ADMIN_EMAIL,
     randevuApiUrl: '',
     randevuApiKey: '',
-    devPaymentsEnabled: true,
+    devPaymentsEnabled: opts.devPaymentsEnabled ?? true,
+    trustedProxies: opts.trustedProxies ?? '127.0.0.1,::1',
+    production: false,
+    // Testlerde sınırlar varsayılan olarak geniş; sınırı deneyen test kendi değerini verir.
+    rateLimits: { registerPerIpHour: 10_000, forgotPerEmailHour: 10_000, forgotPerIpHour: 10_000, loginPerIp15m: 10_000, ...opts.rateLimits },
   };
   const db = new Db(config.databaseUrl);
   const clock = new FakeClock();
@@ -153,7 +166,7 @@ export async function createTestApp(opts: TestAppOptions = {}): Promise<TestApp>
       return (await db.tx((c) => c.query(text, params), scope)).rows;
     },
     async adminSql(text, params = []) {
-      const a = new Client({ connectionString: config.databaseUrl });
+      const a = new Client({ connectionString: adminDbUrl });
       await a.connect();
       try {
         return (await a.query(text, params)).rows;

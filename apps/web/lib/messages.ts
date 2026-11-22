@@ -28,8 +28,17 @@ export function commonError(e: unknown): string | null {
   return MSG.generic;
 }
 
-/** Yalnız site içi yol kabul edilir: `/` ile başlar, `//` ile başlamaz. */
+/**
+ * Yalnız site içi yol kabul edilir. Tarayıcı sekme/satır sonunu silip `/\t/evil.com`'u `//evil.com` yapabildiği için
+ * kontrol karakteri ve ters bölü reddedilir, sonuç ayrıca gerçek URL ayrıştırıcısıyla doğrulanır.
+ */
 export function safeNext(v: string | null | undefined, fallback = '/panel'): string {
-  if (!v || !v.startsWith('/') || v.startsWith('//') || v.startsWith('/\\')) return fallback;
-  return v;
+  if (!v || /[\x00-\x20\\]/.test(v) || !v.startsWith('/') || v.startsWith('//')) return fallback;
+  try {
+    const base = 'https://x.invalid';
+    const u = new URL(v, base);
+    return u.origin === base ? u.pathname + u.search + u.hash : fallback;
+  } catch {
+    return fallback;
+  }
 }

@@ -28,7 +28,7 @@ const UNSAFE = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 export async function createApp(deps: AppDeps, opts: { logger?: boolean } = {}): Promise<NestFastifyApplication> {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule.with(deps),
-    new FastifyAdapter({ bodyLimit: 256 * 1024, trustProxy: true }),
+    new FastifyAdapter({ bodyLimit: 256 * 1024, trustProxy: deps.config.trustedProxies || false }),
     { rawBody: true, logger: opts.logger === false ? false : undefined },
   );
   app.useGlobalFilters(new ApiErrorFilter());

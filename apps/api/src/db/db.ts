@@ -70,16 +70,20 @@ export class Db implements Queryable {
   /** İşlem içinde çalıştırır; hata olursa geri alır. Bağlam işlem başında ayarlanır. */
   async tx<R>(fn: (client: PoolClient) => Promise<R>, scope: DbScope = this.scope): Promise<R> {
     const client = await this.pool.connect();
+    let broken: Error | undefined;
     try {
       await this.begin(client, scope);
       const result = await fn(client);
       await client.query('COMMIT');
       return result;
     } catch (err) {
-      await client.query('ROLLBACK').catch(() => undefined);
+      // Geri alma da başarısızsa bağlantı havuza dönmez (yarım kalmış rol/ayar ile tekrar kullanılmasın).
+      await client.query('ROLLBACK').catch((e: Error) => {
+        broken = e;
+      });
       throw err;
     } finally {
-      client.release();
+      client.release(broken);
     }
   }
 
@@ -92,9 +96,13 @@ export class Db implements Queryable {
 export async function withSystemScope<R>(client: PoolClient, fn: () => Promise<R>): Promise<R> {
   const prev = (await client.query(`SELECT current_setting('app.user_id', true) AS u, current_setting('app.system', true) AS s`)).rows[0];
   await client.query(`SELECT set_config('app.user_id', '', true), set_config('app.system', 'on', true)`);
+  let result: R;
   try {
-    return await fn();
-  } finally {
-    await client.query(`SELECT set_config('app.user_id', $1, true), set_config('app.system', $2, true)`, [prev.u ?? '', prev.s ?? '']);
+    result = await fn();
+  } catch (err) {
+    // İşlem zaten bozuldu ve geri alınacak; ayar işleme özel olduğu için geri yüklemeye gerek yok, asıl hata korunur.
+    throw err;
   }
+  await client.query(`SELECT set_config('app.user_id', $1, true), set_config('app.system', $2, true)`, [prev.u ?? '', prev.s ?? '']);
+  return result;
 }

@@ -8,7 +8,8 @@ Yeni bir proje açılırken bu dört madde CLAUDE.md'ye eklenir ve aşağıdaki 
 ## 1. Veritabanında Row Level Security (RLS) açık
 
 - Kişisel veya müşteri verisi tutan **her tabloda** `ENABLE ROW LEVEL SECURITY` **ve** `FORCE ROW LEVEL SECURITY` açıktır. Politika yazılmamış tablo hiçbir satır göstermez (varsayılan: kapalı kapı).
-- Uygulama veritabanına **süper kullanıcı veya tablo sahibi olarak bağlanmaz**. Uygulamanın kendi rolü vardır (`mv_app`): `NOLOGIN`, `BYPASSRLS` yok, sadece gereken tablo yetkileri.
+- Uygulama veritabanına **süper kullanıcı veya tablo sahibi olarak bağlanmaz**. Üç rol vardır: migration kullanıcısı (tabloların sahibi, yalnız migration), politikaların bağlandığı `NOLOGIN` rol, ve uygulamanın giriş kullanıcısı (süper kullanıcı değil, `BYPASSRLS` yok, tablo sahibi değil). Migration uygulama açılırken değil, ayrı adımda çalışır. Uygulama bu koşullar sağlanmazsa üretimde açılmaz.
+- Silinmemesi gereken kayıt tabloları (onaylar, izinler) tetikleyiciyle korunur: tablo sahibi bile güncelleyemez, silemez.
 - Kim adına çalışıldığı her istekte, işlem başında ayarlanır (`set_config(..., true)`, yani yalnızca o işlem için):
   - Çok kiracılı ürünlerde (Randevu, CRM, Emlak): `app.tenant_id`. Politika yalnızca `tenant_id` eşitliğidir; her indeks `tenant_id` ile başlar.
   - Firma sitesinde: `app.user_id`. Politika yalnızca `user_id` eşitliğidir.
