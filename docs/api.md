@@ -31,7 +31,7 @@ E-postadaki bağlantılar: `${WEB_ORIGIN}/dogrula?token=...` ve `${WEB_ORIGIN}/s
 `GET /api/plans` (girişsiz) → dizi:
 
 ```json
-{ "id": "randevu-aylik", "product": "randevu", "name": "Moonvale Randevu", "interval": "month",
+{ "id": "randevu-aylik", "product": "randevu", "name": "Moonvale Randevu", "interval": "month",  // veya "one_time" (logo-erp)
   "priceKurus": 49900, "perSeat": true, "purchasable": true }
 ```
 
@@ -48,7 +48,7 @@ E-postadaki bağlantılar: `${WEB_ORIGIN}/dogrula?token=...` ve `${WEB_ORIGIN}/s
 ```
 
 - `seats`: `perSeat` planlarda 1–100 arası tam sayı; değilse yok sayılır (1).
-- `companySlug`, `companyName`: sadece `randevu` ürününde zorunlu. Slug `^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$`; ayrılmış adlar (`www`, `api`, `admin`, `panel`, `destek`, `mail`, `app`, `moonvalesoft`) ve başka bir siparişin/aboneliğin aldığı slug → `409 SLUG_TAKEN`. Biçim hatası `400 INVALID_SLUG`.
+- `companySlug`, `companyName`: sadece `randevu` ürününde zorunlu. Slug `^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$` ve art arda iki tire (`--`) yok; ayrılmış adlar (`www`, `api`, `admin`, `panel`, `destek`, `mail`, `app`, `moonvalesoft`) ve başka bir siparişin/aboneliğin aldığı slug → `409 SLUG_TAKEN`. Biçim hatası `400 INVALID_SLUG`.
 - Satın alınamayan plan → `422 PLAN_NOT_PURCHASABLE`. Bilinmeyen plan `404 NOT_FOUND`.
 - Sonuç `201 { orderId, checkoutUrl, amountKurus }`. `amountKurus = priceKurus × seats`; tutar sunucuda hesaplanır, istemciden gelmez.
 
@@ -120,3 +120,28 @@ t.close()
 ```
 
 Her `createTestApp` boş bir veritabanıyla başlar.
+
+## Netleştirmeler (QA soruları, 21 Kasım 2026)
+
+1. Doğrulanmamış üye giriş yapamadığı için satın almaya ulaşamaz; kod yine de `403 EMAIL_NOT_VERIFIED` ile korur.
+2. Geçersiz `seats`, eksik `companyName` → `400 VALIDATION`. Eksik veya bozuk `companySlug` → `400 INVALID_SLUG`.
+3. Test sağlayıcısının imzası: `X-Signature: hex(HMAC-SHA256(secret, hamGövde))`. `t.request` `body` olarak ham string kabul eder (olduğu gibi gönderir).
+4. `amountKurus` yalnızca `payment.succeeded` ve `subscription.renewed` için zorunludur ve yalnızca onlarda sipariş tutarıyla karşılaştırılır. Kısmi iade yok; `payment.refunded` tam iadedir.
+5. Sırasız olaylarda: her geçerli `payment.succeeded`/`subscription.renewed` olayı bir fatura keser (geliş sırasından bağımsız). Firma yalnızca son durum `canceled` değilse açılır; dondurma yalnızca daha önce açılmış (veya açılma işi kuyruğa girmiş) firmaya yapılır. Sipariş durumu da aynı sıralamayla hesaplanır.
+6. Aynı siparişe farklı `eventId` ile ikinci `payment.succeeded` gelirse ikinci fatura kesilir (para ikinci kez alınmış demektir), firma ikinci kez açılmaz.
+7. Ozan'ın adresi: `createTestApp({ adminEmail })`, verilmezse `TEST_ADMIN_EMAIL` (`ozan@moonvalesoft.test`, `helpers/app.ts`'ten dışa açık).
+8. Planlar: `randevu-aylik`, `crm-aylik`, `emlak-aylik` (hepsi şimdilik `perSeat: true`, CRM ve Emlak için **teyit edilecek**), `logo-erp` (`interval: "one_time"`, satılamaz). Şu an `perSeat: false` olan satın alınabilir plan yok; o kuralın testi Ozan karar verene kadar `todo`.
+9. Slug tutma: ödenmiş veya iade edilmiş siparişin slug'ı kalıcı olarak alınmıştır. Başka üyenin bekleyen (`pending`) siparişi slug'ı 1 saat tutar. Aynı üye kendi bekleyen siparişinin slug'ıyla yeniden sipariş verebilir. `failed` sipariş slug tutmaz. `xn--` gibi art arda tire içeren adlar reddedilir.
+10. `POST /api/subscriptions/:id/cancel` aboneliği (`GET /api/subscriptions` öğesi biçiminde) döner. İkinci çağrı `200`, sağlayıcıya ikinci istek gitmez. Zaten `canceled` abonelik → `409 ALREADY_CANCELED`.
+11. Fatura yılı, kesildiği anın UTC yılıdır; numara her yıl 1'den başlar. Faturanın e-postayla gönderilmesi e-Arşiv kararıyla gelecek (şimdilik yok).
+12. Diğerleri:
+    - Başarılı giriş hatalı deneme sayacını sıfırlamaz.
+    - Doğrulanmamış hesap + yanlış şifre → `401 INVALID_CREDENTIALS` (şifre doğruysa `403`).
+    - E-posta büyük/küçük harfe duyarsızdır.
+    - `reset-password` zayıf şifrede `400 WEAK_PASSWORD`.
+    - Oturum ömrü sabit 30 gündür (kaymaz). 30 gün ileri saran testler yeni oturum açmalıdır.
+    - "Zaten hesabın var" e-postası yalnızca şifre sıfırlama bağlantısı içerir.
+    - Talep mesajı: `{ author: "customer" | "staff", body, createdAt }`. Uzunluklar JavaScript `string.length` ile sayılır.
+    - Bütün kimlikler UUID'dir.
+13. `t.runJobs()` her turda zamanı gelmiş (bekleme süresi yok sayılır) her işi **bir kez** dener.
+14. Bilinmeyen `orderId`'li olay kaydedilir ama dışarıdan görünen bir etkisi yoktur.

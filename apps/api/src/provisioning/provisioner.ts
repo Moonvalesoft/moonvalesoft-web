@@ -72,13 +72,14 @@ export class FakeProvisioner implements RandevuProvisioner {
     }
   }
 
+  // Her deneme (başarısız olanlar dahil) kaydedilir.
   async createTenant(input: CreateTenantInput) {
-    this.maybeFail();
     this.calls.push({ op: 'createTenant', ...input });
+    this.maybeFail();
   }
 
   async freezeTenant(input: { slug: string }) {
-    this.maybeFail();
     this.calls.push({ op: 'freezeTenant', slug: input.slug });
+    this.maybeFail();
   }
 }

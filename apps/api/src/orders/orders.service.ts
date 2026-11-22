@@ -61,7 +61,7 @@ export class OrdersService {
     let companyName: string | null = null;
     if (plan.product === 'randevu') {
       slug = typeof body.companySlug === 'string' ? body.companySlug : '';
-      if (!SLUG_RE.test(slug)) {
+      if (!SLUG_RE.test(slug) || slug.includes('--')) {
         throw new ApiError(400, 'INVALID_SLUG', 'Adres 3–30 karakter olmalı; küçük harf, rakam ve tire kullanabilirsin.');
       }
       companyName = typeof body.companyName === 'string' ? body.companyName.trim() : '';

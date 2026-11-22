@@ -4,7 +4,7 @@ export interface PlanDefinition {
   id: string;
   product: Product;
   name: string;
-  interval: 'month' | null;
+  interval: 'month' | 'one_time';
   perSeat: boolean;
   /** Teklifle satılır, sitede satın alınamaz. */
   quoteOnly: boolean;
@@ -14,14 +14,14 @@ export const PLANS: PlanDefinition[] = [
   { id: 'randevu-aylik', product: 'randevu', name: 'Moonvale Randevu', interval: 'month', perSeat: true, quoteOnly: false },
   { id: 'crm-aylik', product: 'crm', name: 'CRM', interval: 'month', perSeat: true, quoteOnly: false },
   { id: 'emlak-aylik', product: 'emlak', name: 'Emlak Sistemi', interval: 'month', perSeat: true, quoteOnly: false },
-  { id: 'logo-erp', product: 'logo-erp', name: 'Logo ERP Entegrasyonu', interval: null, perSeat: false, quoteOnly: true },
+  { id: 'logo-erp', product: 'logo-erp', name: 'Logo ERP Entegrasyonu', interval: 'one_time', perSeat: false, quoteOnly: true },
 ];
 
 export interface PublicPlan {
   id: string;
   product: Product;
   name: string;
-  interval: 'month' | null;
+  interval: 'month' | 'one_time';
   priceKurus: number | null;
   perSeat: boolean;
   purchasable: boolean;
