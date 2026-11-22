@@ -15,11 +15,12 @@ import { spawn } from 'node:child_process';
 import { chmodSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(join(root, 'apps/api/package.json'));
-const { default: EmbeddedPostgres } = await import(require.resolve('embedded-postgres'));
+// Windows'ta mutlak yol import'a file:// adresi olarak verilmeli.
+const { default: EmbeddedPostgres } = await import(pathToFileURL(require.resolve('embedded-postgres')).href);
 const pg = require('pg');
 
 const PORT = 54329;
