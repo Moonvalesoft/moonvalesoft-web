@@ -12,11 +12,11 @@ export interface LegalDocument {
 }
 
 export const LEGAL_DOCUMENTS: readonly LegalDocument[] = [
-  { kind: 'aydinlatma', version: 'taslak-1', title: 'KVKK Aydınlatma Metni', path: '/kvkk' },
-  { kind: 'on_bilgilendirme', version: 'taslak-1', title: 'Ön Bilgilendirme Formu', path: '/on-bilgilendirme' },
-  { kind: 'mesafeli_satis', version: 'taslak-1', title: 'Mesafeli Satış Sözleşmesi', path: '/mesafeli-satis' },
-  { kind: 'kampanya_izni', version: 'taslak-1', title: 'Ticari Elektronik İleti İzni', path: '/kampanya-izni' },
-  { kind: 'iptal_iade', version: 'taslak-1', title: 'İptal ve İade Koşulları', path: '/iptal-iade' },
+  { kind: 'aydinlatma', version: 'taslak-2', title: 'KVKK Aydınlatma Metni', path: '/kvkk' },
+  { kind: 'on_bilgilendirme', version: 'taslak-2', title: 'Ön Bilgilendirme Formu', path: '/on-bilgilendirme' },
+  { kind: 'mesafeli_satis', version: 'taslak-2', title: 'Mesafeli Satış Sözleşmesi', path: '/mesafeli-satis' },
+  { kind: 'kampanya_izni', version: 'taslak-2', title: 'Ticari Elektronik İleti İzni', path: '/kampanya-izni' },
+  { kind: 'iptal_iade', version: 'taslak-2', title: 'İptal ve İade Koşulları', path: '/iptal-iade' },
 ];
 
 export function currentVersion(kind: LegalKind): string {

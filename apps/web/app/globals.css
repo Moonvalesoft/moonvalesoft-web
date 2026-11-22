@@ -38,6 +38,19 @@
   :focus-visible { outline: 2px solid var(--mv-secondary); outline-offset: 2px; border-radius: 4px; }
 }
 @layer components {
+  .legal-prose { color: var(--mv-text-muted); }
+  .legal-prose h1 { @apply mb-6 text-4xl font-semibold; color: var(--mv-text); }
+  .legal-prose h2 { @apply mt-10 mb-3 text-2xl font-semibold; color: var(--mv-text); }
+  .legal-prose h3 { @apply mt-6 mb-2 text-lg font-semibold; color: var(--mv-text); }
+  .legal-prose p, .legal-prose ul, .legal-prose ol, .legal-prose table, .legal-prose blockquote { @apply mt-3; }
+  .legal-prose ul { @apply list-disc pl-6; }
+  .legal-prose ol { @apply list-decimal pl-6; }
+  .legal-prose li { @apply mt-1; }
+  .legal-prose strong { color: var(--mv-text); }
+  .legal-prose table { @apply block w-full overflow-x-auto text-sm; border-collapse: collapse; }
+  .legal-prose th, .legal-prose td { @apply px-3 py-2 text-left align-top; border: 1px solid var(--mv-border); }
+  .legal-prose blockquote { @apply border-l-2 pl-4; border-color: var(--mv-border-strong); }
+  .legal-prose code { @apply rounded-sm px-1 text-sm; background: var(--mv-surface); }
   .container-mv { width: 100%; max-width: var(--mv-max-width); margin-inline: auto; padding-inline: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

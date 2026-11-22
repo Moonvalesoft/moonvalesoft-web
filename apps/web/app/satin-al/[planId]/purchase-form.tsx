@@ -261,7 +261,7 @@ export function PurchaseForm({
           </Checkbox>
         </div>
         <Button type="submit" disabled={busy} className="mt-5 min-h-14 w-full">
-          {busy ? 'Ödeme sayfası hazırlanıyor…' : 'Ödemeye geç'}
+          {busy ? 'Ödeme sayfası hazırlanıyor…' : 'Siparişi onayla ve öde'}
         </Button>
         <p className="mt-4 flex gap-2 text-sm text-subtle">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="mt-1 shrink-0">

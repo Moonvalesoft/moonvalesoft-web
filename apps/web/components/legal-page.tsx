@@ -1,3 +1,4 @@
+import { legalHtml } from '@/lib/legal-content';
 import { serverApi, type LegalDoc } from '@/lib/server-api';
 
 /** Hukukçudan metin gelene kadar ne yazacağını söyleyen yer tutucu. Hukuki cümle uydurulmaz. */
@@ -44,25 +45,33 @@ const OUTLINE: Record<LegalDoc['kind'], { intro: string; items: string[] }> = {
 };
 
 export async function LegalPage({ kind, title }: { kind: LegalDoc['kind']; title: string }) {
-  const docs = await serverApi<LegalDoc[]>('/api/legal');
+  const [docs, html] = await Promise.all([serverApi<LegalDoc[]>('/api/legal'), legalHtml(kind)]);
   const doc = docs?.find((d) => d.kind === kind);
   const o = OUTLINE[kind];
   return (
     <article className="container-mv max-w-3xl py-14 md:py-20">
-      <h1 className="text-4xl font-semibold">{doc?.title ?? title}</h1>
-      {doc && <p className="mt-2 text-sm text-subtle">Sürüm: {doc.version}</p>}
-      <div role="note" className="mt-8 rounded-lg border border-secondary bg-surface p-6">
-        <p className="font-semibold">Metin hukukçudan gelecek.</p>
-        <p className="mt-2 text-muted">{o.intro} Kesin metin hazır olunca bu sayfa güncellenecek ve sürüm numarası değişecek.</p>
+      {doc && <p className="text-sm text-subtle">Sürüm: {doc.version}</p>}
+      <div role="note" className="my-6 rounded-lg border border-secondary bg-surface p-5">
+        <p className="font-semibold">Taslak: avukat onayı bekliyor.</p>
+        <p className="mt-1 text-sm text-muted">
+          Bu metin henüz kesinleşmedi; köşeli parantezli yerler doldurulacak. Kesin metin yayımlanınca sürüm numarası değişir.
+        </p>
       </div>
-      <h2 className="mb-3 mt-10 font-sans text-xl font-semibold">Bu metinde yer alacaklar</h2>
-      <ul className="list-disc pl-6 text-muted">
-        {o.items.map((i) => (
-          <li key={i} className="mt-1.5">
-            {i}
-          </li>
-        ))}
-      </ul>
+      {html ? (
+        <div className="legal-prose" dangerouslySetInnerHTML={{ __html: html }} />
+      ) : (
+        <>
+          <h1 className="text-4xl font-semibold">{doc?.title ?? title}</h1>
+          <p className="mt-4 text-muted">{o.intro}</p>
+          <ul className="mt-4 list-disc pl-6 text-muted">
+            {o.items.map((i) => (
+              <li key={i} className="mt-1.5">
+                {i}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </article>
   );
 }

@@ -195,11 +195,14 @@ export function AuthForm({ initial, noticeVersion }: { initial: Tab; noticeVersi
               &apos;ni okudum.
             </Checkbox>
             <Checkbox checked={marketing} onChange={setMarketing}>
-              Yeni özellik ve kampanyalardan e-postayla haberdar olmak istiyorum.{' '}
+              Moonvalesoft&apos;tan yeni özellikler, kampanyalar ve duyurular hakkında <strong>e-posta</strong> almak istiyorum. (
               <Link href="/kampanya-izni" target="_blank">
                 İzin metni
               </Link>
-              . <span className="text-subtle">(İsteğe bağlı; istediğin zaman panelinden kapatırsın.)</span>
+              )
+              <span className="mt-1 block text-subtle">
+                İstemezsen işaretleme. Üyeliğin ve aldığın hizmet aynen devam eder. İznini istediğin an panelden geri alabilirsin.
+              </span>
             </Checkbox>
           </>
         ) : (
