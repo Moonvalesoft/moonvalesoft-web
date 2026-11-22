@@ -53,6 +53,7 @@ export class JobsService {
     try {
       if (job.kind === 'create_tenant') {
         await this.deps.provisioner.createTenant({
+          subscriptionId: p.subscriptionId,
           slug: p.slug,
           companyName: p.companyName,
           ownerEmail: p.ownerEmail,

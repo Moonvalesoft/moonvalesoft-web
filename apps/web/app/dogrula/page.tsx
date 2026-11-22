@@ -13,7 +13,7 @@ export default function Page() {
     if (ran.current) return;
     ran.current = true;
     try {
-      setNext(safeNext(localStorage.getItem('mv_next')));
+      setNext(safeNext(sessionStorage.getItem('mv_next')));
     } catch {
       /* yok */
     }

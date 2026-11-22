@@ -95,7 +95,7 @@ export function AuthForm({ initial, noticeVersion }: { initial: Tab; noticeVersi
           body: { name: name.trim(), email, password, noticeVersion, marketingEmail: marketing },
         });
         try {
-          localStorage.setItem('mv_next', next);
+          sessionStorage.setItem('mv_next', next);
         } catch {
           /* yoksa panel */
         }
@@ -110,9 +110,9 @@ export function AuthForm({ initial, noticeVersion }: { initial: Tab; noticeVersi
         await api('/api/auth/login', { body: { email, password } });
         let target = next;
         try {
-          const saved = localStorage.getItem('mv_next');
+          const saved = sessionStorage.getItem('mv_next');
           if (!params.get('sonra') && saved) target = safeNext(saved);
-          localStorage.removeItem('mv_next');
+          sessionStorage.removeItem('mv_next');
         } catch {
           /* yok */
         }

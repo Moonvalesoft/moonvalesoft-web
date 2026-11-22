@@ -9,11 +9,17 @@ import { FakePaymentProvider } from './payments/provider';
 import { HttpRandevuProvisioner, LoggingProvisioner } from './provisioning/provisioner';
 import { createApp } from './app';
 import { JobsService } from './jobs/jobs.service';
+import { assertAppRole } from './db/app-role';
 
 async function main() {
   const config = loadConfig();
-  await migrate(config.databaseUrl);
+  if (process.env.MIGRATE_ON_START === 'true' && !config.production) {
+    const url = process.env.MIGRATION_DATABASE_URL;
+    if (!url) throw new Error('MIGRATE_ON_START için MIGRATION_DATABASE_URL gerekli');
+    await migrate(url);
+  }
   const db = new Db(config.databaseUrl);
+  await assertAppRole(db, config.production);
   const app = await createApp({
     config,
     db,

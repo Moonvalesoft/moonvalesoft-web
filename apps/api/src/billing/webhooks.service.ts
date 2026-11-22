@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { PoolClient } from 'pg';
 import { ApiError } from '../common/errors';
@@ -70,13 +71,14 @@ export class WebhooksService {
   constructor(@Inject(DEPS) private readonly deps: AppDeps) {}
 
   @SystemScope()
-  async handle(rawBody: string, headers: Record<string, string | string[] | undefined>): Promise<void> {
+  async handle(rawBody: string, headers: Record<string, string | string[] | undefined>, sourceIp: string | null = null): Promise<void> {
     const event = this.deps.payments.parseWebhook(rawBody, headers);
     if (!event) {
-      this.logger.warn('İmzası doğrulanamayan ödeme bildirimi reddedildi');
+      const digest = createHash('sha256').update(rawBody).digest('hex').slice(0, 16);
+      this.logger.warn(`İmzası doğrulanamayan ödeme bildirimi reddedildi (ip ${sourceIp ?? '-'}, gövde ${digest}, ${rawBody.length} bayt)`);
       throw new ApiError(401, 'INVALID_SIGNATURE', 'İmza geçersiz.');
     }
-    const alerts: string[] = [];
+    const alerts: [string, string][] = [];
     await this.deps.db.tx(async (c) => {
       await c.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`order:${event.orderId}`]);
       const now = this.deps.clock.now();
@@ -88,9 +90,10 @@ export class WebhooksService {
       const carriesMoney = event.type === 'payment.succeeded' || event.type === 'subscription.renewed';
       if (order && carriesMoney && event.amountKurus !== Number(order.amount_kurus)) {
         valid = false;
-        alerts.push(
+        alerts.push([
+          'Ödeme tutarı uyuşmuyor',
           `Sipariş ${order.id} için gelen ödeme tutarı (${event.amountKurus ?? 'yok'} kuruş) sipariş tutarıyla (${order.amount_kurus} kuruş) tutmuyor. Olay: ${event.eventId}. Sipariş ödenmiş sayılmadı.`,
-        );
+        ]);
       }
 
       const inserted = await c.query(
@@ -105,9 +108,9 @@ export class WebhooksService {
       if (!order || !valid) return;
 
       if (carriesMoney) await this.issueInvoice(c, order, event.eventId, now);
-      await this.applyState(c, order, now);
+      await this.applyState(c, order, now, alerts);
     });
-    for (const a of alerts) await this.alert('Ödeme tutarı uyuşmuyor', a);
+    for (const [subject, body] of alerts) await this.alert(subject, body);
   }
 
   private async issueInvoice(c: PoolClient, order: any, eventId: string, now: Date) {
@@ -123,7 +126,7 @@ export class WebhooksService {
     );
   }
 
-  private async applyState(c: PoolClient, order: any, now: Date) {
+  private async applyState(c: PoolClient, order: any, now: Date, alerts: [string, string][]) {
     const events = (await c.query('SELECT event_id, type, occurred_at, period_end FROM payment_events WHERE order_id = $1 AND valid', [order.id])).rows;
     const s = deriveState(events);
     await c.query('UPDATE orders SET status = $2 WHERE id = $1', [order.id, s.orderStatus]);
@@ -143,6 +146,22 @@ export class WebhooksService {
 
     if (product !== 'randevu' || !order.company_slug) return;
     if (s.subStatus !== 'canceled' && sub.provisioning === 'none') {
+      // Aynı adres başka bir ödenmiş siparişe aitse (ör. ödenmemiş sipariş 1 saat sonra bırakıldı, sonra geç ödendi)
+      // firma açılmaz; Ozan'a haber gider. İki ödeme aynı anda gelirse adres kilidi sıraya koyar.
+      await c.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`slug:${order.company_slug}`]);
+      const clash = await c.query(
+        `SELECT o.id FROM orders o JOIN subscriptions s ON s.order_id = o.id
+         WHERE o.company_slug = $1 AND o.id <> $2 AND s.provisioning <> 'none' LIMIT 1`,
+        [order.company_slug, order.id],
+      );
+      if (clash.rows.length) {
+        await c.query("UPDATE subscriptions SET provisioning = 'failed' WHERE id = $1", [sub.id]);
+        alerts.push([
+          `Adres çakışması: ${order.company_slug}`,
+          `${order.company_slug}.moonvalesoft.com için ikinci bir ödeme geldi; firma açılmadı.\nYeni sipariş: ${order.id}\nAdresi tutan sipariş: ${clash.rows[0].id}\nMüşteriyle konuşup iade veya yeni adres gerekiyor.`,
+        ]);
+        return;
+      }
       await enqueueJob(c, 'create_tenant', `create:${sub.id}`, {
         subscriptionId: sub.id,
         slug: order.company_slug,

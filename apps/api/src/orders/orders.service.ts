@@ -10,7 +10,11 @@ import { recordAcknowledgement } from '../legal/consents.service';
 import { mails } from '../mail/templates';
 
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$/;
-export const RESERVED_SLUGS = new Set(['www', 'api', 'admin', 'panel', 'destek', 'mail', 'app', 'moonvalesoft']);
+export const RESERVED_SLUGS = new Set([
+  'www', 'api', 'admin', 'panel', 'destek', 'mail', 'app', 'moonvalesoft', 'randevu', 'auth', 'login', 'giris', 'kayit',
+  'odeme', 'billing', 'status', 'static', 'cdn', 'docs', 'blog', 'support', 'help', 'yardim', 'test', 'dev', 'staging',
+  'smtp', 'imap', 'pop', 'webmail', 'autodiscover', 'autoconfig', 'ns1', 'ns2', 'mx', 'security', 'guvenlik', 'crm', 'emlak',
+]);
 /** Ödenmemiş bir sipariş, slug'ı başka üyelere karşı bu kadar süre tutar. */
 const PENDING_HOLD_MS = 1 * HOUR;
 

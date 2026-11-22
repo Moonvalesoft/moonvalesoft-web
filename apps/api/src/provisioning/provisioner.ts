@@ -1,6 +1,8 @@
 import { Logger } from '@nestjs/common';
 
 export interface CreateTenantInput {
+  /** Tekrar denemede aynı firmanın iki kez açılmaması için anahtar (Randevu aynı anahtara 200 döner). */
+  subscriptionId: string;
   slug: string;
   companyName: string;
   ownerEmail: string;
@@ -21,23 +23,28 @@ export class HttpRandevuProvisioner implements RandevuProvisioner {
     private readonly apiKey: string,
   ) {}
 
-  private async post(path: string, body: unknown) {
-    const res = await fetch(new URL(path, this.baseUrl), {
+  private async post(path: string, body: unknown, idempotencyKey: string) {
+    return fetch(new URL(path, this.baseUrl), {
       method: 'POST',
-      headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}`, 'idempotency-key': idempotencyKey },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(15_000),
     });
-    // 409: zaten var / zaten dondurulmuş → başarılı say (işlem tekrar edilebilir olmalı).
-    if (!res.ok && res.status !== 409) throw new Error(`Randevu API ${path}: HTTP ${res.status}`);
   }
 
-  createTenant(input: CreateTenantInput) {
-    return this.post('/internal/tenants', input);
+  /**
+   * Sözleşme (Randevu tarafında yazılacak): aynı `Idempotency-Key` ile tekrar gelen istek 200 döner.
+   * 409 = adres başka bir aboneliğe ait; bu bir hatadır, başarılı sayılmaz.
+   */
+  async createTenant(input: CreateTenantInput) {
+    const res = await this.post('/internal/tenants', input, `create:${input.subscriptionId}`);
+    if (!res.ok) throw new Error(`Randevu API firma açma: HTTP ${res.status}${res.status === 409 ? ' (adres başka bir aboneliğe ait)' : ''}`);
   }
 
-  freezeTenant(input: { slug: string }) {
-    return this.post(`/internal/tenants/${encodeURIComponent(input.slug)}/freeze`, {});
+  /** Zaten dondurulmuşsa 409 başarılı sayılır. */
+  async freezeTenant(input: { slug: string }) {
+    const res = await this.post(`/internal/tenants/${encodeURIComponent(input.slug)}/freeze`, {}, `freeze:${input.slug}`);
+    if (!res.ok && res.status !== 409) throw new Error(`Randevu API dondurma: HTTP ${res.status}`);
   }
 }
 

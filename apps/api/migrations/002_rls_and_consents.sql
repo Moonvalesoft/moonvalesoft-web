@@ -8,8 +8,8 @@ BEGIN
   END IF;
 END
 $$;
--- Migration'ı çalıştıran kullanıcı (uygulamanın bağlandığı kullanıcı) mv_app'e geçebilsin.
-GRANT mv_app TO CURRENT_USER;
+-- Giriş yapan kullanıcılar db/roles.sql ile kurulur: mv_migrator (tabloların sahibi, migration'ı çalıştırır)
+-- ve mv_api (uygulama; mv_app üyesi, tablo sahibi değil). Uygulama asla migration kullanıcısıyla bağlanmaz.
 
 -- Yasal belge onayları: aydınlatma (kayıtta), ön bilgilendirme ve mesafeli satış (siparişte). Silinmez, güncellenmez.
 CREATE TABLE legal_acknowledgements (

@@ -7,10 +7,11 @@ function formatTL(kurus: number): string {
 const sign = '\n\nOzan\nMoonvalesoft';
 
 export const mails = {
-  verifyEmail: (to: string, name: string, link: string): MailMessage => ({
+  // Kullanıcının yazdığı ad bu e-postaya konmaz: başkasının adresine bizim alan adımızdan metin gönderilmesin.
+  verifyEmail: (to: string, link: string): MailMessage => ({
     to,
     subject: 'E-posta adresini doğrula',
-    text: `Merhaba ${name},\n\nMoonvalesoft hesabını açtığın için teşekkürler. Adresini doğrulamak için bağlantıya tıkla:\n\n${link}\n\nBağlantı 24 saat geçerli. Bu hesabı sen açmadıysan bu e-postayı yok sayabilirsin.${sign}`,
+    text: `Merhaba,\n\nMoonvalesoft hesabını açtığın için teşekkürler. Adresini doğrulamak için bağlantıya tıkla:\n\n${link}\n\nBağlantı 24 saat geçerli. Bu hesabı sen açmadıysan bu e-postayı yok sayabilirsin.${sign}`,
   }),
   alreadyRegistered: (to: string, link: string): MailMessage => ({
     to,

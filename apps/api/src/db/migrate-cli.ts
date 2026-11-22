@@ -1,8 +1,9 @@
 import { migrate } from './migrate';
 
-const url = process.env.DATABASE_URL;
+// Migration tabloların sahibi olan kullanıcıyla çalışır; uygulamanın kullanıcısıyla değil.
+const url = process.env.MIGRATION_DATABASE_URL;
 if (!url) {
-  console.error('DATABASE_URL eksik');
+  console.error('MIGRATION_DATABASE_URL eksik');
   process.exit(1);
 }
 migrate(url)

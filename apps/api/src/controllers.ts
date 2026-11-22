@@ -71,8 +71,8 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
-  async login(@Body() b: unknown, @Res({ passthrough: true }) reply: FastifyReply) {
-    const { user, sessionToken } = await this.auth.login(body(b));
+  async login(@Req() req: FastifyRequest, @Body() b: unknown, @Res({ passthrough: true }) reply: FastifyReply) {
+    const { user, sessionToken } = await this.auth.login(body(b), requestMeta(req));
     reply.header('set-cookie', this.cookie(sessionToken, SESSION_TTL_MS / 1000));
     return { user };
   }
@@ -86,8 +86,8 @@ export class AuthController {
 
   @Post('forgot-password')
   @HttpCode(202)
-  async forgot(@Body() b: unknown) {
-    await this.auth.forgotPassword(body(b));
+  async forgot(@Req() req: FastifyRequest, @Body() b: unknown) {
+    await this.auth.forgotPassword(body(b), requestMeta(req));
     return { ok: true };
   }
 
@@ -199,7 +199,7 @@ export class WebhooksController {
   @HttpCode(200)
   async payments(@Req() req: FastifyRequest & { rawBody?: Buffer | string }) {
     const raw = req.rawBody === undefined ? '' : req.rawBody.toString();
-    await this.webhooks.handle(raw, req.headers);
+    await this.webhooks.handle(raw, req.headers, req.ip ?? null);
     return { ok: true };
   }
 }
