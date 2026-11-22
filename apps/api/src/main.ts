@@ -4,7 +4,7 @@ import { loadConfig } from './config';
 import { systemClock } from './common/clock';
 import { Db } from './db/db';
 import { migrate } from './db/migrate';
-import { SmtpMailer } from './mail/mailer';
+import { ConsoleMailer, SmtpMailer } from './mail/mailer';
 import { FakePaymentProvider } from './payments/provider';
 import { HttpRandevuProvisioner, LoggingProvisioner } from './provisioning/provisioner';
 import { createApp } from './app';
@@ -24,7 +24,8 @@ async function main() {
     config,
     db,
     clock: systemClock,
-    mailer: new SmtpMailer(config.smtpUrl, config.mailFrom),
+    mailer:
+      config.smtpUrl === 'console' && !config.production ? new ConsoleMailer() : new SmtpMailer(config.smtpUrl, config.mailFrom),
     payments: new FakePaymentProvider(config.paymentWebhookSecret, config.webOrigin),
     provisioner: config.randevuApiUrl
       ? new HttpRandevuProvisioner(config.randevuApiUrl, config.randevuApiKey)

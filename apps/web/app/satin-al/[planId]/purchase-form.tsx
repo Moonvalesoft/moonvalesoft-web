@@ -207,7 +207,7 @@ export function PurchaseForm({
               {plan.interval === 'month' ? ', aylık abonelik' : ''}
             </dd>
             <dt className="text-subtle">Toplam</dt>
-            <dd className="font-semibold">{formatTL(total)} [KDV NOTU: teyit edilecek]</dd>
+            <dd className="font-semibold">{formatTL(total)} (KDV dahil)</dd>
             <dt className="text-subtle">İptal</dt>
             <dd>İstediğin zaman panelinden iptal edersin; dönem sonuna kadar kullanırsın. Cayma hakkı ve iade koşulları: teyit edilecek.</dd>
           </dl>
@@ -236,7 +236,7 @@ export function PurchaseForm({
           )}
           <div className="flex justify-between">
             <dt className="text-muted">Vergiler</dt>
-            <dd>[KDV NOTU]</dd>
+            <dd>KDV dahil</dd>
           </div>
         </dl>
         <div className="mt-4 flex items-baseline justify-between">

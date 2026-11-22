@@ -23,6 +23,14 @@ export class SmtpMailer implements Mailer {
   }
 }
 
+/** Yalnız yerel deneme (SMTP_URL=console): e-postayı terminale yazar, bağlantılar tıklanabilir. */
+export class ConsoleMailer implements Mailer {
+  async send(message: MailMessage): Promise<void> {
+    const line = '─'.repeat(60);
+    console.log(`\n${line}\n✉  ${message.to} · ${message.subject}\n${line}\n${message.text}\n${line}\n`);
+  }
+}
+
 export interface SentMail extends MailMessage {
   links: string[];
 }

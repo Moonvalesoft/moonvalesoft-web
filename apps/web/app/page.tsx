@@ -180,7 +180,7 @@ export default async function Home() {
 
       <section id="fiyatlar" className="container-mv scroll-mt-8 py-28">
         <h2 className="mb-3 text-[clamp(32px,4vw,52px)] font-semibold">Fiyatlar</h2>
-        <p className="mb-12 text-muted">Aylık plan, gizli ücret yok, istediğin zaman iptal.</p>
+        <p className="mb-12 text-muted">Aylık plan, fiyatlara KDV dahil, gizli ücret yok, istediğin zaman iptal.</p>
         {plans.length === 0 ? (
           <p className="text-muted" role="status">
             Fiyatları şu an getiremedim. Birazdan tekrar bak ya da bana yaz.
