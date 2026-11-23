@@ -27,11 +27,14 @@ export interface Offering {
   tone: Tone;
 }
 
-export const PRODUCTS: Offering[] = [
+export const SOFTWARE: Offering[] = [
   { slug: 'randevu', title: 'Randevu', text: 'Online randevu, otomatik hatırlatma ve personel takvimi.', icon: 'calendar', tone: 'moon' },
   { slug: 'crm', title: 'CRM', text: 'Müşteriler, teklifler ve satış hattı tek yerde.', icon: 'people', tone: 'violet' },
   { slug: 'emlak', title: 'Emlak Sistemi', text: 'Portföy yönetimi ve alıcı–ilan eşleştirme.', icon: 'home', tone: 'teal' },
   { slug: 'b2b', title: 'B2B', text: 'Bayilerin ve kurumsal müşterilerin sipariş verdiği portal.', icon: 'store', tone: 'water' },
+];
+
+export const INTEGRATIONS: Offering[] = [
   { slug: 'e-ticaret-entegrasyonu', title: 'E-Ticaret Entegrasyonu', text: 'Web sitesi ve pazaryeri siparişlerini sistemine bağlar.', icon: 'cart', tone: 'moon' },
   { slug: 'banka-entegrasyonu', title: 'Banka Entegrasyonu', text: 'Banka hareketlerini sistemine aktarır.', icon: 'bank', tone: 'violet' },
   { slug: 'kasa-entegrasyonu', title: 'Kasa Entegrasyonu', text: 'Kasa satışlarını sistemine bağlar.', icon: 'register', tone: 'teal' },
