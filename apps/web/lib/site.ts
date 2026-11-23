@@ -15,18 +15,22 @@ export function telegramLink(text?: string): string {
 
 export type IconName = 'calendar' | 'people' | 'home' | 'sync' | 'layers' | 'rules';
 
+/** Ürünün rengi: tokens.json'daki tile* değişkenleri. */
+export type Tone = 'moon' | 'violet' | 'teal' | 'water';
+
 export interface Offering {
   /** İleride ürün sayfası adresi olacak: /urunler/<slug> */
   slug: string;
   title: string;
   text: string;
   icon: IconName;
+  tone: Tone;
 }
 
 export const PRODUCTS: Offering[] = [
-  { slug: 'randevu', title: 'Moonvale Randevu', text: 'Online randevu, otomatik hatırlatma ve personel takvimi.', icon: 'calendar' },
-  { slug: 'crm', title: 'CRM', text: 'Müşteriler, teklifler ve satış hattı tek yerde.', icon: 'people' },
-  { slug: 'emlak', title: 'Emlak Sistemi', text: 'Portföy yönetimi ve alıcı–ilan eşleştirme.', icon: 'home' },
+  { slug: 'randevu', title: 'Moonvale Randevu', text: 'Online randevu, otomatik hatırlatma ve personel takvimi.', icon: 'calendar', tone: 'moon' },
+  { slug: 'crm', title: 'CRM', text: 'Müşteriler, teklifler ve satış hattı tek yerde.', icon: 'people', tone: 'violet' },
+  { slug: 'emlak', title: 'Emlak Sistemi', text: 'Portföy yönetimi ve alıcı–ilan eşleştirme.', icon: 'home', tone: 'teal' },
 ];
 
 export const LOGO_SERVICES: Offering[] = [
@@ -35,18 +39,21 @@ export const LOGO_SERVICES: Offering[] = [
     title: 'Logo ERP Entegrasyonu',
     text: 'E-ticaret, pazaryeri ve özel sistemlerle Logo arasında köprü.',
     icon: 'sync',
+    tone: 'water',
   },
   {
     slug: 'logo-object-designer',
     title: 'Logo Object Designer ile uyarlama',
     text: 'Tiger serisi ve Bordro Plus için ihtiyacına göre uyarlama.',
     icon: 'layers',
+    tone: 'teal',
   },
   {
     slug: 'logo-cloud-connect',
     title: 'Cloud Connect kuralları',
     text: "Logo Cloud Connect'te işine göre kural yazımı.",
     icon: 'rules',
+    tone: 'violet',
   },
 ];
 

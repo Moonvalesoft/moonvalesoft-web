@@ -21,6 +21,21 @@
   --mv-logo-hill-front: #2F7F72;
   --mv-logo-hill-back: #5FB3A0;
   --mv-logo-water: #7DB8EE;
+  --mv-sky-top: #060918;
+  --mv-sky-mid: #16195A;
+  --mv-sky-horizon: #3A2A7A;
+  --mv-sky-glow: #1C6E7A;
+  --mv-mt-far: #2A3F7A;
+  --mv-mt-mid: #1E5F72;
+  --mv-mt-near: #23806C;
+  --mv-river: #5EC4F2;
+  --mv-river-light: #D2F1FF;
+  --mv-moon-glow: #F7E7B0;
+  --mv-star: #FFFFFF;
+  --mv-tile-moon: #F3E2A9;
+  --mv-tile-violet: #A99BFF;
+  --mv-tile-teal: #5FCFB0;
+  --mv-tile-water: #7DC6F5;
 }
 :root, [data-theme="gece"] { color-scheme: dark; }
 [data-theme="gunduz"] {
@@ -45,6 +60,21 @@
   --mv-logo-hill-front: #1E5E57;
   --mv-logo-hill-back: #3E9583;
   --mv-logo-water: #2F6FC0;
+  --mv-sky-top: #4FA6EC;
+  --mv-sky-mid: #8FCBF3;
+  --mv-sky-horizon: #FFD9B3;
+  --mv-sky-glow: #FFF1D6;
+  --mv-mt-far: #8FB8DA;
+  --mv-mt-mid: #5FA9A0;
+  --mv-mt-near: #3E9583;
+  --mv-river: #2F7FD0;
+  --mv-river-light: #E6F6FF;
+  --mv-moon-glow: #FFF6D8;
+  --mv-star: #FFFFFF00;
+  --mv-tile-moon: #C9921A;
+  --mv-tile-violet: #4733C9;
+  --mv-tile-teal: #1E7F6B;
+  --mv-tile-water: #2F6FC0;
 }
 [data-theme="gunduz"] { color-scheme: light; }
 :root {

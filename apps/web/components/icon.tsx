@@ -9,14 +9,14 @@ const PATHS: Record<IconName, string> = {
   rules: 'M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2',
 };
 
-export function Icon({ name, tone }: { name: IconName; tone: 'accent' | 'secondary' }) {
+export function Icon({ name, color }: { name: IconName; color: string }) {
   return (
     <svg
       width="32"
       height="32"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={tone === 'accent' ? 'var(--mv-accent-text)' : 'var(--mv-secondary)'}
+      stroke={color}
       strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"

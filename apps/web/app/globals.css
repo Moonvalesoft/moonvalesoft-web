@@ -55,3 +55,11 @@
   .container-mv { width: 100%; max-width: var(--mv-max-width); margin-inline: auto; padding-inline: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Açılış: dağ katmanları sırayla yerine oturur (bir kez). Hareket kapalıysa sabit. */
+@keyframes mv-rise {
+  from { transform: translateY(36px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.mv-rise { animation: mv-rise 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.mv-sky { background: linear-gradient(to bottom, var(--mv-sky-top), var(--mv-sky-mid) 52%, var(--mv-sky-horizon)); }
