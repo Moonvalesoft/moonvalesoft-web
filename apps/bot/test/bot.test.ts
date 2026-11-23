@@ -130,6 +130,21 @@ describe('Ozanay\'ın cevabı', () => {
     expect(r.sent()[0]).toMatchObject({ chat_id: OWNER, text: TEXT.replyHint });
   });
 
+  it('kendi hesabından deneyebilir: botun sorusunu yanıtlarsa talep olarak kendisine gelir, yanıtı da kendisine döner', async () => {
+    const r = recorder();
+    const prompt: Message = { message_id: 60, from: bot, chat: { id: OWNER, type: 'private' }, text: TEXT.askQuote('CRM') };
+    await handleUpdate(msg('deneme', { reply_to_message: prompt, chat: { id: OWNER, type: 'private' } }, owner), env, r.api);
+    const [toOwner, thanks] = r.sent();
+    expect(toOwner.chat_id).toBe(OWNER);
+    expect(toOwner.text).toContain(`#u${OWNER}`);
+    expect(thanks).toMatchObject({ chat_id: OWNER, text: TEXT.thanks });
+
+    const r2 = recorder();
+    const forwardedToSelf: Message = { message_id: 61, from: bot, chat: { id: OWNER, type: 'private' }, text: toOwner.text };
+    await handleUpdate(msg('cevap', { reply_to_message: forwardedToSelf, chat: { id: OWNER, type: 'private' } }, owner), env, r2.api);
+    expect(r2.sent()[0]).toMatchObject({ chat_id: OWNER, text: 'Ozanay: cevap' });
+  });
+
   it('/kimim sohbet kimliğini söyler (kurulum için)', async () => {
     const r = recorder();
     await handleUpdate(msg('/kimim'), env, r.api);

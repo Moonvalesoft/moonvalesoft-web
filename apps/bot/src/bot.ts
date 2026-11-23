@@ -136,6 +136,7 @@ export async function handleUpdate(update: Update, env: BotEnv, api: Api): Promi
   const m = update.message;
   if (!m || m.chat.type !== 'private') return;
   const isOwner = env.OWNER_CHAT_ID !== '' && String(m.chat.id) === String(env.OWNER_CHAT_ID);
-  if (isOwner && m.reply_to_message) return onOwnerMessage(api, m);
+  // Ozanay botun sorusunu yanıtlarsa müşteri gibi işlenir (kendi hesabından deneyebilsin diye).
+  if (isOwner && m.reply_to_message && !parsePrompt(m.reply_to_message.text)) return onOwnerMessage(api, m);
   return onCustomerMessage(api, env, m);
 }
