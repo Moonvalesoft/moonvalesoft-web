@@ -1,18 +1,19 @@
 # Moonvalesoft Web
 
-Moonvalesoft'un firma sitesi: `moonvalesoft.com`. Ürünleri tanıtır, üyelik açtırır, ödemeyi alır ve satın alınan ürünü kendiliğinden kurar.
+Moonvalesoft'un firma sitesi: `moonvalesoft.com`. Ürünleri ve Logo hizmetlerini tanıtır; müşteri teklif, öneri ve şikâyet için Ozan'a **Telegram'dan** ulaşır.
 Kurucu ve son onay mercii: **Ozan**. Ana dala Ozan onaylamadan kod girmez.
 
-Hedef: Ozan satış sürecinde elle hiçbir şey yapmasın. Müşteri paketi seçer, üye olur, öder; ürün hazır olur, fatura e-postasına gider.
+Kapsam (Ozan, 23 Kasım 2026): üyelik, giriş, fiyat, ödeme ve hukuk sayfaları **yok**. Her ürün ve hizmette "Teklif al" düğmesi Telegram sohbetini açar. Önceki üyelikli/ödemeli sürüm `demo` dalında duruyor.
 
-## Ürünler
+## İçerik
 
-- Moonvale Randevu (aylık, kullanıcı başına) — ödeme sonrası `<firma>.moonvalesoft.com` kendiliğinden açılır.
-- CRM (aylık) — teyit edilecek: ayrı ürün mü, ne zaman satışa çıkacak.
-- Emlak Sistemi (aylık) — teyit edilecek.
-- Logo ERP Entegrasyonu — projeye göre teklif; ödeme siteden, aşama aşama alınır.
+Bütün ürün ve hizmet metinleri `apps/web/lib/site.ts` içinde. Telegram kullanıcı adı `NEXT_PUBLIC_TELEGRAM_USERNAME`.
 
-Fiyatlar Ozan'dan gelir ve **KDV dahildir** (Ozan, 22 Kasım 2026); tutarlar henüz belirlenmedi. Fiyat, özellik veya yasal metin uydurma; bilinmiyorsa `[FİYAT]`, "teyit edilecek" yaz.
+- Ürünler: Moonvale Randevu, CRM, Emlak Sistemi.
+- Logo hizmetleri: Logo ERP entegrasyonu; Logo Object Designer ile uyarlama (Tiger serisi, Bordro Plus); Logo Cloud Connect kuralları.
+- Sonra: her ürün için görsel/video sayfası (`/urunler/<slug>`), ürünler bitince.
+
+Fiyat, özellik veya müşteri sayısı uydurma; bilinmiyorsa yazma ya da "teyit edilecek" de.
 
 ## Tasarım kuralları (değiştirmeden önce Ozan'a sor)
 
@@ -23,34 +24,21 @@ Fiyatlar Ozan'dan gelir ve **KDV dahildir** (Ozan, 22 Kasım 2026); tutarlar hen
 - Erişilebilirlik: her iki modda metin kontrastı en az 4.5:1, dokunma alanı en az 44 px, klavyeyle gezilebilir.
 - Onaylı tasarım tuvali: https://claude.ai/artifact/1SscxbqpGfU3zmStL96iVL (artboard "3 · Gece" ve "3b · Gündüz").
 
-## Uyum kuralları (bütün Moonvalesoft ürünleri, ayrıntı: `docs/uyum-standardi.md`)
+## Uyum
 
-1. **RLS açık:** bütün tablolarda `ENABLE` + `FORCE ROW LEVEL SECURITY`; API `mv_app` rolüyle çalışır (süper kullanıcı değil, `BYPASSRLS` yok); bağlam `app.user_id` veya açıkça yazılmış `app.system`; bağlamsız sorgu satır görmez.
-2. **Aydınlatma metni:** kişisel veri toplayan her formda bağlantı; üyelikte "okudum" kutucuğu zorunlu; gösterilen sürüm `legal_acknowledgements`'a yazılır.
-3. **Kampanya izni:** ayrı, isteğe bağlı, işaretsiz kutucuk; her değişiklik `marketing_consents`'e yeni satır; panelden tek tıkla geri alınır; işlem e-postalarına kampanya konmaz.
-4. **Ön bilgilendirme:** her satın almada ödeme öncesi ön bilgilendirme + mesafeli satış sözleşmesi, zorunlu onay, siparişe bağlı kayıt, e-postayla kopya.
+Site şu an kişisel veri toplamıyor (form, üyelik, çerez yok; tema seçimi yalnız tarayıcıda). Bir form veya üyelik eklenirse `docs/uyum-standardi.md` (bütün Moonvalesoft ürünleri) hemen geçerli olur: aydınlatma metni, kampanya izni, RLS.
 
-Metinleri hukukçu yazar; sürümleri `apps/api/src/legal/documents.ts` tutar.
+## Teknik kararlar
 
-## Teknik kararlar (taslak — Ozan onayı bekliyor)
-
-- Moonvale Randevu ile aynı yığın, tek geliştirici iki farklı dünya öğrenmesin diye:
-  - Web: Next.js (arama motorları için sunucu tarafı sayfa), shadcn/ui + Tailwind.
-  - API: TypeScript + NestJS (Fastify), PostgreSQL.
-- Üyelik: e-posta + şifre, e-posta doğrulaması zorunlu. Müşteri paneli: paketlerim, faturalarım, destek taleplerim.
-- Ödeme: sağlayıcı henüz seçilmedi (aday: Lemon Squeezy / Paddle veya iyzico / PayTR). Kod tek bir `PaymentProvider` arayüzünün arkasında yazılır; sağlayıcı değişince sadece adaptör değişir.
-- Kart bilgisi bizde asla tutulmaz ve sunucumuzdan geçmez; sağlayıcının ödeme sayfası veya gömülü formu kullanılır.
-- Satın alma kesinleşmesi yalnızca sağlayıcının imzalı webhook'u ile olur; tarayıcıdan gelen "ödeme başarılı" yönlendirmesine güvenilmez. Webhook'lar idempotenttir.
-- Randevu satın alınınca Randevu API'sindeki yetkili bir uç noktayla firma (tenant) kendiliğinden açılır. Abonelik biterse firma dondurulur, veri silinmez.
-- Fatura: e-Arşiv zorunluluğu ve hangi entegratörün kullanılacağı teyit edilecek (muhasebeci ile).
-- Yasal sayfalar: KVKK aydınlatma metni, mesafeli satış sözleşmesi, ön bilgilendirme formu, iptal ve iade — metinleri hukukçu yazar, biz yer açarız.
-- Altyapı: Randevu ile aynı sunucu, Docker Compose, Caddy. `moonvalesoft.com` ve `www` bu projeye gider.
+- Next.js, statik dışa aktarım (`output: 'export'`): sunucu ve veritabanı yok; `npm run build` çıktısı `apps/web/out` herhangi bir statik barındırmaya konur.
+- Tailwind; renkler `design/tokens.json` → `app/tokens.css`.
+- Fotoğraf GitHub sitesinden (`ozanaycelik.github.io/assets/img/profile.jpg`), yoksa baş harf.
+- Güvenlik başlıkları (CSP, HSTS) barındırma tarafında verilir.
 
 ## Çalışma kuralları (bütün roller)
 
 - Her değişiklik bir PR'dır; testler geçmeden ve Ozan onaylamadan birleştirme yok.
 - Ekran işi önce ui-ux'ten geçer: ui-ux tasarımı ve kabul kriterlerini yazar, frontend uygular, ui-ux PR'ı tasarıma uygunluk için inceler.
-- Kabul testlerini QA önceden yazar; kodu yazan ajan kendi kabul testini yazıp geçirmez.
-- Asla atlanmayacak testler: ödeme webhook'u (sahte, tekrarlanan, sırası bozuk istek), başarısız ödeme, abonelik iptali, bir üyenin başka üyenin faturasını görememesi, RLS (her tabloda açık, bağlamsız sorgu boş), aydınlatma/izin/ön bilgilendirme kayıtları.
+- Her PR'da: `npm run typecheck`, `npm run build`, iki modda ve telefonda görünüm kontrolü.
 - Uydurma rakam, fiyat veya hukuki kesinlik yazma; bilmiyorsan "teyit edilecek" de.
 - Yazışma dili Türkçe; kod, tablo ve değişken adları İngilizce.

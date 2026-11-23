@@ -5,10 +5,9 @@
     "apps/*"
   ],
   "scripts": {
-    "test": "npm run test --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
-    "demo": "node scripts/demo.mjs"
+    "dev": "npm run dev -w @moonvalesoft/web",
+    "build": "npm run build -w @moonvalesoft/web",
+    "typecheck": "npm run typecheck -w @moonvalesoft/web"
   },
   "engines": {
     "node": ">=22"

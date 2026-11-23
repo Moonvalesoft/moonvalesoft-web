@@ -9,3 +9,4 @@ coverage/
 .pgdata/
 *.tsbuildinfo
 .demo/
+apps/web/out/

@@ -7,7 +7,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: { default: 'Moonvalesoft — işini kolaylaştıran yazılımlar', template: '%s · Moonvalesoft' },
-  description: 'Randevu, CRM, emlak yönetimi ve Logo ERP entegrasyonu. Paketini seç, öde; kurulumu ben yaparım.',
+  description: "Randevu, CRM ve emlak yazılımları; Logo ERP entegrasyonu, Object Designer uyarlamaları ve Cloud Connect kuralları. Bana Telegram'dan yaz.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
