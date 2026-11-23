@@ -1,6 +1,6 @@
 # Moonvalesoft Web
 
-Moonvalesoft'un firma sitesi: https://moonvalesoft.github.io/moonvalesoft-web/ (GitHub Pages, `main`'e her birleştirmede kendiliğinden yayınlanır; alt yol yayın akışında otomatik). Ürünleri ve Logo hizmetlerini tanıtır; müşteri teklif, öneri ve şikâyet için Ozan'a **Telegram'dan** ulaşır.
+Moonvalesoft'un firma sitesi: https://moonvalesoft.github.io/moonvalesoft-web/ (GitHub Pages, `main`'e her birleştirmede kendiliğinden yayınlanır; alt yol yayın akışında otomatik). Ürünleri ve Logo hizmetlerini tanıtır; müşteri teklif, öneri ve şikâyet için Ozanay'a **Telegram'dan** ulaşır. Sitede yazı: "Moonvalesoft" (büyük M); kişi adı "Ozanay".
 Kurucu ve son onay mercii: **Ozan**. Ana dala Ozan onaylamadan kod girmez.
 
 Kapsam (Ozan, 23 Kasım 2026): üyelik, giriş, fiyat, ödeme ve hukuk sayfaları **yok**. Her ürün ve hizmette "Teklif al" düğmesi Telegram sohbetini açar. Önceki üyelikli/ödemeli sürüm `demo` dalında duruyor.
@@ -9,7 +9,7 @@ Kapsam (Ozan, 23 Kasım 2026): üyelik, giriş, fiyat, ödeme ve hukuk sayfalar�
 
 Bütün ürün ve hizmet metinleri `apps/web/lib/site.ts` içinde. Telegram: `ozanay24` (`NEXT_PUBLIC_TELEGRAM_USERNAME` ile değişir).
 
-- Ürünler: Moonvale Randevu, CRM, Emlak Sistemi.
+- Ürünler: Randevu, CRM, Emlak Sistemi, B2B, E-Ticaret Entegrasyonu, Banka Entegrasyonu, Kasa Entegrasyonu.
 - Logo hizmetleri: Logo ERP entegrasyonu; Logo Object Designer ile uyarlama (Tiger serisi, Bordro Plus); Logo Cloud Connect kuralları.
 - "Nasıl çalışır": ayın dört evresi = projenin dört adımı (keşif, plan ve teklif, kurulum, destek), `PROJECT_PHASES`.
 - Logo: "Hilal Vadi" (hilal, içindeki vadiyi kucaklar), `design/brand/logo.svg`.

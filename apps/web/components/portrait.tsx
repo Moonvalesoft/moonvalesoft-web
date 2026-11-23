@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Ozan'ın fotoğrafı, GitHub sitesinden (ozanaycelik.github.io/assets/img/profile.jpg) canlı okunur:
+ * Ozanay'ın fotoğrafı, GitHub sitesinden (ozanaycelik.github.io/assets/img/profile.jpg) canlı okunur:
  * oradaki fotoğraf değişince burada da değişir. Fotoğraf yoksa ay içinde baş harf görünür.
  */
 export const PROFILE_PHOTO_URL =
@@ -28,7 +28,7 @@ export function Portrait() {
         <img
           ref={ref}
           src={PROFILE_PHOTO_URL}
-          alt="Ozan'ın fotoğrafı"
+          alt="Ozanay'ın fotoğrafı"
           width={260}
           height={260}
           className="h-full w-full object-cover"

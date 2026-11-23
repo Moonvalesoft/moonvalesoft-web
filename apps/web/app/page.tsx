@@ -119,7 +119,7 @@ export default function Home() {
           <Portrait />
         </div>
         <div className="min-w-0 flex-[999_1_520px]">
-          <h2 className="text-[clamp(32px,4vw,52px)] font-semibold">Merhaba, ben Ozan.</h2>
+          <h2 className="text-[clamp(32px,4vw,52px)] font-semibold">Merhaba, ben Ozanay.</h2>
           <p className="mt-5 text-[19px] text-muted">
             Logo ERP uyarlama ve entegrasyonunda takım lideriyim; C#/.NET ve SQL Server ile çalışıyorum. Moonvalesoft&apos;u, küçük
             işletmelerin de sağlam yazılıma kolayca ulaşabilmesi için kurdum.

@@ -13,7 +13,7 @@ export function telegramLink(text?: string): string {
   return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }
 
-export type IconName = 'calendar' | 'people' | 'home' | 'sync' | 'layers' | 'rules';
+export type IconName = 'calendar' | 'people' | 'home' | 'sync' | 'layers' | 'rules' | 'store' | 'cart' | 'bank' | 'register';
 
 /** Ürünün rengi: tokens.json'daki tile* değişkenleri. */
 export type Tone = 'moon' | 'violet' | 'teal' | 'water';
@@ -28,9 +28,13 @@ export interface Offering {
 }
 
 export const PRODUCTS: Offering[] = [
-  { slug: 'randevu', title: 'Moonvale Randevu', text: 'Online randevu, otomatik hatırlatma ve personel takvimi.', icon: 'calendar', tone: 'moon' },
+  { slug: 'randevu', title: 'Randevu', text: 'Online randevu, otomatik hatırlatma ve personel takvimi.', icon: 'calendar', tone: 'moon' },
   { slug: 'crm', title: 'CRM', text: 'Müşteriler, teklifler ve satış hattı tek yerde.', icon: 'people', tone: 'violet' },
   { slug: 'emlak', title: 'Emlak Sistemi', text: 'Portföy yönetimi ve alıcı–ilan eşleştirme.', icon: 'home', tone: 'teal' },
+  { slug: 'b2b', title: 'B2B', text: 'Bayilerin ve kurumsal müşterilerin sipariş verdiği portal.', icon: 'store', tone: 'water' },
+  { slug: 'e-ticaret-entegrasyonu', title: 'E-Ticaret Entegrasyonu', text: 'Web sitesi ve pazaryeri siparişlerini sistemine bağlar.', icon: 'cart', tone: 'moon' },
+  { slug: 'banka-entegrasyonu', title: 'Banka Entegrasyonu', text: 'Banka hareketlerini sistemine aktarır.', icon: 'bank', tone: 'violet' },
+  { slug: 'kasa-entegrasyonu', title: 'Kasa Entegrasyonu', text: 'Kasa satışlarını sistemine bağlar.', icon: 'register', tone: 'teal' },
 ];
 
 export const LOGO_SERVICES: Offering[] = [
@@ -57,7 +61,7 @@ export const LOGO_SERVICES: Offering[] = [
   },
 ];
 
-export const quoteText = (title: string) => `Merhaba Ozan, ${title} için teklif almak istiyorum.`;
+export const quoteText = (title: string) => `Merhaba Ozanay, ${title} için teklif almak istiyorum.`;
 
 /** Ayın dört evresi = bir projenin dört adımı (ana sayfadaki "Nasıl çalışır"). */
 export type Phase = 'yeni' | 'ilk' | 'dolunay' | 'son';

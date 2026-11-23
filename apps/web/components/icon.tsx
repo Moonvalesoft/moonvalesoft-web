@@ -7,6 +7,10 @@ const PATHS: Record<IconName, string> = {
   sync: 'M8 7h12l-3-3M16 17H4l3 3',
   layers: 'M12 3l9 5-9 5-9-5zM3 13l9 5 9-5M3 17.5l9 5 9-5',
   rules: 'M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2',
+  store: 'M3 9l1.5-5h15L21 9M3 9h18M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M5 12v8h14v-8M10 20v-5h4v5',
+  cart: 'M3 4h2l2.4 11h11l2-8H6.5M10 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
+  bank: 'M3 10l9-6 9 6M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18',
+  register: 'M5 11h14l1 9H4zM8 11V7h8v4M9 4h6v3H9zM8 15h2M12 15h2M8 18h8',
 };
 
 export function Icon({ name, color }: { name: IconName; color: string }) {
