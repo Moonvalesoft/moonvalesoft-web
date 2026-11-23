@@ -20,10 +20,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Site kendi alan adında (moonvalesoft.app) kök adreste yayınlanır; alt yol yok.
       - run: npm run build
-        env:
-          PAGES_BASE_PATH: /moonvalesoft-web
-          NEXT_PUBLIC_BASE_PATH: /moonvalesoft-web
       - run: touch apps/web/out/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:

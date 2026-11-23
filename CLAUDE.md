@@ -1,6 +1,6 @@
 # Moonvalesoft Web
 
-Moonvalesoft'un firma sitesi: `moonvalesoft.com`. Ürünleri ve Logo hizmetlerini tanıtır; müşteri teklif, öneri ve şikâyet için Ozan'a **Telegram'dan** ulaşır.
+Moonvalesoft'un firma sitesi: `moonvalesoft.app` (GitHub Pages, `main`'e her birleştirmede kendiliğinden yayınlanır). Ürünleri ve Logo hizmetlerini tanıtır; müşteri teklif, öneri ve şikâyet için Ozan'a **Telegram'dan** ulaşır.
 Kurucu ve son onay mercii: **Ozan**. Ana dala Ozan onaylamadan kod girmez.
 
 Kapsam (Ozan, 23 Kasım 2026): üyelik, giriş, fiyat, ödeme ve hukuk sayfaları **yok**. Her ürün ve hizmette "Teklif al" düğmesi Telegram sohbetini açar. Önceki üyelikli/ödemeli sürüm `demo` dalında duruyor.
