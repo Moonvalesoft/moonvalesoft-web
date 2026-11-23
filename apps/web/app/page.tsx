@@ -220,7 +220,6 @@ export default function Home() {
           <p className="mt-4 max-w-[60ch] text-[19px] text-muted">
             Moonvalesoft&apos;u, sağlam yazılım yalnız büyük şirketlerin işi olmasın diye kurdum.
           </p>
-          <p className="mt-4 max-w-[60ch] text-[19px] font-medium text-fg">Bana yazdığında karşına çağrı merkezi değil, sistemi yazan kişi çıkar.</p>
         </div>
       </section>
 
