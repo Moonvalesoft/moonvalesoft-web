@@ -37,11 +37,22 @@ describe('menü', () => {
     expect(m.reply_markup.inline_keyboard.flat().map((b: any) => b.callback_data)).toEqual(['k:teklif', 'k:sikayet', 'k:oneri']);
   });
 
-  it('bağlamsız yazı menüyü gösterir, Ozanay\'a bir şey gitmez', async () => {
+  it('düğmeye basmadan yazılan mesaj "💬 Mesaj" olarak Ozanay\'a gider, kişiye 24 saat yanıtı döner', async () => {
     const r = recorder();
-    await handleUpdate(msg('merhaba'), env, r.api);
-    expect(r.sent()).toHaveLength(1);
-    expect(r.sent()[0].text).toBe(TEXT.welcome);
+    await handleUpdate(msg('merhaba fiyat ne'), env, r.api);
+    const [toOwner, thanks] = r.sent();
+    expect(toOwner.chat_id).toBe(OWNER);
+    expect(toOwner.text.split('\n')[0]).toBe('💬 Mesaj');
+    expect(toOwner.text).toContain('#u42');
+    expect(toOwner.text).toContain('merhaba fiyat ne');
+    expect(thanks).toMatchObject({ chat_id: 42, text: TEXT.thanks });
+  });
+
+  it('yazısız mesaj ve bilinmeyen komut menüyü gösterir, Ozanay\'a bir şey gitmez', async () => {
+    const r = recorder();
+    await handleUpdate(msg(''), env, r.api);
+    await handleUpdate(msg('/yardim'), env, r.api);
+    expect(r.sent().map((m) => m.text)).toEqual([TEXT.welcome, TEXT.welcome]);
   });
 
   it('Teklif: bütün ürünler ve "Başka bir konu" düğmesi', async () => {
@@ -96,11 +107,12 @@ describe('talep iletimi', () => {
     expect(owner).toEqual(['⚠️ Şikâyet', '💡 Öneri']);
   });
 
-  it('kişinin kendi mesajını yanıtlaması talep sayılmaz', async () => {
+  it('kişi kendi mesajını yanıtlarsa kategori taklit edilemez, düz mesaj olarak gider', async () => {
     const r = recorder();
     const own: Message = { message_id: 3, from: ayse, chat: { id: 42, type: 'private' }, text: 'Teklif · CRM' };
     await handleUpdate(msg('selam', { reply_to_message: own }), env, r.api);
-    expect(r.sent().every((m) => m.chat_id !== OWNER)).toBe(true);
+    const toOwner = r.sent().find((m) => m.chat_id === OWNER);
+    expect(toOwner?.text.split('\n')[0]).toBe('💬 Mesaj');
   });
 
   it('grup sohbetlerine yanıt verilmez', async () => {

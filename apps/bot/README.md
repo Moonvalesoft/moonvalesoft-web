@@ -23,7 +23,7 @@ Siteden gelen kişiyi karşılar: **Teklif / Şikâyet / Öneri** seçtirir, tek
 
 ## Kullanım
 
-- Talep gelince sana: `🆕 Teklif · CRM`, kimden, mesaj ve `#u…` etiketi.
+- Talep gelince sana: `🆕 Teklif · CRM` (ya da `⚠️ Şikâyet`, `💡 Öneri`), kimden, mesaj ve `#u…` etiketi. Düğmeye basmadan yazılan mesajlar `💬 Mesaj` başlığıyla gelir.
 - Cevap vermek için o mesajı **yanıtla** (basılı tut → Yanıtla). Cevabın kişiye "Ozanay: …" diye gider.
 - Metinler `src/bot.ts` içindeki `TEXT`; ürün listesi sitedekiyle aynı (`apps/web/lib/offerings.ts`).
 

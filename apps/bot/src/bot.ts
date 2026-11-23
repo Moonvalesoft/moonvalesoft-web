@@ -7,6 +7,7 @@ import type { Api, Button, CallbackQuery, Message, Update, User } from './telegr
  *  2. Teklif → ürün düğmeleri. Ürün seçilince "ihtiyacını yaz" sorusu yanıt kutusuyla (ForceReply) sorulur.
  *  3. Kişi soruyu yanıtlayınca: kişiye "24 saat içerisinde dönüş yapılacaktır", Ozanay'a talep iletilir.
  *     Kategori, sorunun ilk satırından anlaşılır (ör. "Teklif · Randevu").
+ *     Düğmeye basmadan yazılan mesaj da "💬 Mesaj" başlığıyla Ozanay'a iletilir.
  *  4. Ozanay iletilen talebi yanıtlarsa cevabı kişiye gider (#u<kimlik> etiketinden).
  */
 
@@ -30,7 +31,7 @@ export const TEXT = {
   replyHint: 'Cevap vermek için iletilen talebi yanıtla (mesaja basılı tut → Yanıtla).',
 };
 
-const KIND_LABEL = { quote: '🆕 Teklif', complaint: '⚠️ Şikâyet', suggestion: '💡 Öneri' } as const;
+const KIND_LABEL = { quote: '🆕 Teklif', complaint: '⚠️ Şikâyet', suggestion: '💡 Öneri', message: '💬 Mesaj' } as const;
 type Kind = keyof typeof KIND_LABEL;
 
 const mainMenu: Button[][] = [
@@ -118,12 +119,15 @@ async function onCustomerMessage(api: Api, env: BotEnv, m: Message) {
     return;
   }
 
-  // Yalnız botun sorduğu soruya verilen yanıt talep sayılır.
-  const prompt = m.reply_to_message?.from?.is_bot === true ? parsePrompt(m.reply_to_message.text) : null;
-  if (!prompt || !text) {
+  // Yazısız mesaj (çıkartma, fotoğraf) ya da başka bir komut: menü.
+  if (!text || text.startsWith('/')) {
     await sendMenu(api, chatId);
     return;
   }
+  // Botun sorusuna yanıtsa kategorisiyle, değilse "💬 Mesaj" olarak iletilir.
+  const prompt = (m.reply_to_message?.from?.is_bot === true ? parsePrompt(m.reply_to_message.text) : null) ?? {
+    kind: 'message' as const,
+  };
 
   const who = m.from ? displayName(m.from) : 'Bilinmeyen';
   const head = prompt.kind === 'quote' ? `${KIND_LABEL.quote} · ${prompt.product}` : KIND_LABEL[prompt.kind];
