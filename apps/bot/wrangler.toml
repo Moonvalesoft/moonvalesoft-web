@@ -1,0 +1,9 @@
+# Moonvalesoft Telegram botu: Cloudflare Workers (ücretsiz plan yeter). Kurulum: apps/bot/README.md
+name = "moonvalesoft-bot"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+
+# Gizli değerler depoya girmez; şu komutlarla verilir:
+#   npx wrangler secret put TELEGRAM_TOKEN     (BotFather'ın verdiği anahtar)
+#   npx wrangler secret put WEBHOOK_SECRET     (rastgele uzun bir metin)
+#   npx wrangler secret put OWNER_CHAT_ID      (botta /kimim yazınca öğrenilir)

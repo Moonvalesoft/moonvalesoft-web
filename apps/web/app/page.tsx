@@ -3,7 +3,7 @@ import { Portrait } from '@/components/portrait';
 import { HeroScene, RidgeStrip } from '@/components/scene';
 import { buttonClass } from '@/components/ui/button';
 import { MoonPhase } from '@/components/moon-phase';
-import { INTEGRATIONS, LOGO_SERVICES, PROJECT_PHASES, SOFTWARE, quoteText, telegramLink, type Offering, type Tone } from '@/lib/site';
+import { INTEGRATIONS, LOGO_SERVICES, PROJECT_PHASES, SOFTWARE, quoteLink, contactLink, type Offering, type Tone } from '@/lib/site';
 
 const TONE: Record<Tone, string> = {
   moon: 'var(--mv-tile-moon)',
@@ -27,7 +27,7 @@ function OfferingRow({ o }: { o: Offering }) {
         <p className="mt-1 max-w-[52ch] text-muted">{o.text}</p>
       </div>
       <a
-        href={telegramLink(quoteText(o.title))}
+        href={quoteLink(o.slug, o.title)}
         className={buttonClass('outline', 'col-start-2 gap-2 justify-self-start sm:col-start-auto sm:justify-self-end')}
         aria-label={`${o.title} için teklif al`}
       >
@@ -70,7 +70,7 @@ function TileIcon({ o, size = 'md' }: { o: Offering; size?: 'md' | 'lg' }) {
 
 function QuoteButton({ o, className = '' }: { o: Offering; className?: string }) {
   return (
-    <a href={telegramLink(quoteText(o.title))} className={buttonClass('outline', `gap-2 ${className}`)} aria-label={`${o.title} için teklif al`}>
+    <a href={quoteLink(o.slug, o.title)} className={buttonClass('outline', `gap-2 ${className}`)} aria-label={`${o.title} için teklif al`}>
       <TelegramIcon />
       Teklif al
     </a>
@@ -167,7 +167,7 @@ export default function Home() {
               <a href="#urunler" className={buttonClass('primary', 'px-7 py-4 shadow-[0_8px_30px_color-mix(in_srgb,var(--mv-accent)_35%,transparent)]')}>
                 Ürünlere bak
               </a>
-              <a href={telegramLink()} className={buttonClass('outline', 'gap-2 bg-bg/40 px-7 py-4 backdrop-blur-md')}>
+              <a href={contactLink()} className={buttonClass('outline', 'gap-2 bg-bg/40 px-7 py-4 backdrop-blur-md')}>
                 <TelegramIcon />
                 Telegram&apos;dan yaz
               </a>
@@ -233,7 +233,7 @@ export default function Home() {
             <p className="mt-4 text-lg text-fg">Öneri, şikâyet ya da teklif için bana Telegram&apos;dan ulaş.</p>
           </div>
           <a
-            href={telegramLink()}
+            href={contactLink()}
             className={buttonClass('primary', 'gap-2 px-8 py-4 text-lg shadow-[0_8px_30px_color-mix(in_srgb,var(--mv-accent)_35%,transparent)]')}
           >
             <TelegramIcon />

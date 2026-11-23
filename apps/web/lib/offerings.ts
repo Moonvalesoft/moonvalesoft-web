@@ -1,0 +1,65 @@
+/**
+ * Ürün, hizmet ve proje evreleri: yalnız veri. Site ve Telegram botu (apps/bot) aynı listeyi kullanır.
+ * Ürün eklemek ya da metin değiştirmek için bu dosyaya dokunmak yeter.
+ */
+
+export type IconName = 'calendar' | 'people' | 'home' | 'sync' | 'layers' | 'rules' | 'store' | 'cart' | 'bank' | 'register';
+
+/** Ürünün rengi: tokens.json'daki tile* değişkenleri. */
+export type Tone = 'moon' | 'violet' | 'teal' | 'water';
+
+export interface Offering {
+  /** İleride ürün sayfası adresi olacak: /urunler/<slug> */
+  slug: string;
+  title: string;
+  text: string;
+  icon: IconName;
+  tone: Tone;
+}
+
+export const SOFTWARE: Offering[] = [
+  { slug: 'randevu', title: 'Randevu', text: 'Online randevu, otomatik hatırlatma ve personel takvimi.', icon: 'calendar', tone: 'moon' },
+  { slug: 'crm', title: 'CRM', text: 'Müşteriler, teklifler ve satış hattı tek yerde.', icon: 'people', tone: 'violet' },
+  { slug: 'emlak', title: 'Emlak Sistemi', text: 'Portföy yönetimi ve alıcı–ilan eşleştirme.', icon: 'home', tone: 'teal' },
+  { slug: 'b2b', title: 'B2B', text: 'Bayilerin ve kurumsal müşterilerin sipariş verdiği portal.', icon: 'store', tone: 'water' },
+];
+
+export const INTEGRATIONS: Offering[] = [
+  { slug: 'e-ticaret-entegrasyonu', title: 'E-Ticaret Entegrasyonu', text: 'Web sitesi ve pazaryeri siparişlerini sistemine bağlar.', icon: 'cart', tone: 'moon' },
+  { slug: 'banka-entegrasyonu', title: 'Banka Entegrasyonu', text: 'Banka hareketlerini sistemine aktarır.', icon: 'bank', tone: 'violet' },
+  { slug: 'kasa-entegrasyonu', title: 'Kasa Entegrasyonu', text: 'Kasa satışlarını sistemine bağlar.', icon: 'register', tone: 'teal' },
+];
+
+export const LOGO_SERVICES: Offering[] = [
+  {
+    slug: 'logo-erp-entegrasyonu',
+    title: 'Logo ERP Entegrasyonu',
+    text: 'E-ticaret, pazaryeri ve özel sistemlerle Logo arasında köprü.',
+    icon: 'sync',
+    tone: 'water',
+  },
+  {
+    slug: 'logo-object-designer',
+    title: 'Logo Object Designer ile uyarlama',
+    text: 'Tiger serisi ve Bordro Plus için ihtiyacına göre uyarlama.',
+    icon: 'layers',
+    tone: 'teal',
+  },
+  {
+    slug: 'logo-cloud-connect',
+    title: 'Cloud Connect kuralları',
+    text: "Logo Cloud Connect'te işine göre kural yazımı.",
+    icon: 'rules',
+    tone: 'violet',
+  },
+];
+
+/** Ayın dört evresi = bir projenin dört adımı (ana sayfadaki "Nasıl çalışır"). */
+export type Phase = 'yeni' | 'ilk' | 'dolunay' | 'son';
+
+export const PROJECT_PHASES: { phase: Phase; moon: string; step: string; text: string }[] = [
+  { phase: 'yeni', moon: 'Yeni ay', step: 'Keşif', text: "Telegram'dan yazarsın; işini ve ihtiyacını birlikte konuşuruz." },
+  { phase: 'ilk', moon: 'İlk dördün', step: 'Plan ve teklif', text: 'Kapsamı netleştirir, sana özel teklifi ve takvimi çıkarırım.' },
+  { phase: 'dolunay', moon: 'Dolunay', step: 'Kurulum', text: 'Sistemi kurar, ayarlar ve çalışır hâlde teslim ederim.' },
+  { phase: 'son', moon: 'Son dördün', step: 'Destek', text: 'Kullandıkça iyileştirir, sorularına yanıt veririm.' },
+];
