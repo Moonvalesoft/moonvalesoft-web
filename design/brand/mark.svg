@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Moonvalesoft işareti (gece). Sitedeki Mark bileşeniyle aynı çizim. -->
+  <clipPath id="c"><circle cx="32" cy="32" r="32"/></clipPath>
+  <g clip-path="url(#c)">
+    <rect width="64" height="64" fill="#111838"/>
+    <circle cx="32" cy="30" r="15" fill="#F3E2A9"/>
+    <path fill="#232C5C" d="M0 40 C10 36 20 34 26 40 C29 43 31 46 32 47 C34 44 38 36 44 30 C50 25 58 27 64 31 V64 H0Z"/>
+    <path fill="#171E43" d="M0 50 C12 47 22 48 28 52 C30 53 31 54 32 54 C36 51 44 45 52 44 C58 43 62 44 64 45 V64 H0Z"/>
+  </g>
+</svg>

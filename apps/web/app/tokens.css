@@ -17,6 +17,11 @@
   --mv-on-secondary: #0A0E1F;
   --mv-success: #7BE0A8;
   --mv-danger: #FF9B8F;
+  --mv-sky: #111838;
+  --mv-vale-far: #232C5C;
+  --mv-vale-mid: #171E43;
+  --mv-vale-near: #0A0E1F;
+  --mv-star: #EDEFF7;
 }
 :root, [data-theme="gece"] { color-scheme: dark; }
 [data-theme="gunduz"] {
@@ -37,6 +42,11 @@
   --mv-on-secondary: #FFFFFF;
   --mv-success: #146C43;
   --mv-danger: #B42318;
+  --mv-sky: #E2E6F6;
+  --mv-vale-far: #C9CFEA;
+  --mv-vale-mid: #DCE0F1;
+  --mv-vale-near: #F4F5FA;
+  --mv-star: #F4F5FA;
 }
 [data-theme="gunduz"] { color-scheme: light; }
 :root {

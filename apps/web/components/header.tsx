@@ -6,17 +6,17 @@ import { buttonClass } from './ui/button';
 
 export function Header() {
   return (
-    <header className="container-mv flex flex-wrap items-center justify-between gap-4 py-6">
+    <header className="container-mv flex items-center justify-between gap-4 py-6">
       <Logo />
-      <nav aria-label="Ana menü" className="flex flex-wrap gap-x-7 gap-y-2 text-[15px] [&>a]:inline-flex [&>a]:min-h-11 [&>a]:items-center">
+      <nav aria-label="Ana menü" className="hidden gap-x-7 text-[15px] md:flex [&>a]:inline-flex [&>a]:min-h-11 [&>a]:items-center">
         <a href="#urunler" className="text-muted no-underline hover:text-fg">Ürünler</a>
         <a href="#logo" className="text-muted no-underline hover:text-fg">Logo hizmetleri</a>
         <a href="#nasil" className="text-muted no-underline hover:text-fg">Nasıl çalışır</a>
         <a href="#ben" className="text-muted no-underline hover:text-fg">Hakkımda</a>
       </nav>
-      <div className="flex items-center gap-3 text-[15px]">
+      <div className="flex shrink-0 items-center gap-2 text-[15px] sm:gap-3">
         <ThemeToggle />
-        <a href={telegramLink()} className={buttonClass('primary', 'gap-2 px-5')}>
+        <a href={telegramLink()} className={buttonClass("primary", "gap-2 px-4 sm:px-5")}>
           <TelegramIcon />
           Bana yaz
         </a>

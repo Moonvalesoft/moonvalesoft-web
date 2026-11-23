@@ -1,5 +1,6 @@
 import { Icon, TelegramIcon } from '@/components/icon';
 import { Portrait } from '@/components/portrait';
+import { ValleyScene } from '@/components/valley';
 import { buttonClass } from '@/components/ui/button';
 import { LOGO_SERVICES, PRODUCTS, quoteText, telegramLink, type Offering } from '@/lib/site';
 
@@ -10,80 +11,83 @@ const PHASES = [
   { title: 'Kurulumu ben yaparım', text: 'Kurar, teslim eder, yanında olurum.', fill: 'full' },
 ] as const;
 
-function OfferingCard({ o, tone }: { o: Offering; tone: 'accent' | 'secondary' }) {
+function OfferingRow({ o, tone }: { o: Offering; tone: 'accent' | 'secondary' }) {
   return (
-    <article className="flex flex-col gap-3.5 rounded-lg border border-line bg-surface p-8">
-      <Icon name={o.icon} tone={tone} />
-      <h3 className="text-2xl font-semibold">{o.title}</h3>
-      <p className="grow text-muted">{o.text}</p>
-      <a href={telegramLink(quoteText(o.title))} className={buttonClass('outline', 'mt-2 gap-2')} aria-label={`${o.title} için teklif al`}>
+    <li className="grid grid-cols-[auto_1fr] items-start gap-x-5 gap-y-3 border-t border-line py-7 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+      <span className="mt-1 sm:mt-0">
+        <Icon name={o.icon} tone={tone} />
+      </span>
+      <div>
+        <h3 className="text-2xl font-semibold">{o.title}</h3>
+        <p className="mt-1 max-w-[52ch] text-muted">{o.text}</p>
+      </div>
+      <a
+        href={telegramLink(quoteText(o.title))}
+        className={buttonClass('outline', 'col-start-2 gap-2 justify-self-start sm:col-start-auto sm:justify-self-end')}
+        aria-label={`${o.title} için teklif al`}
+      >
         <TelegramIcon />
         Teklif al
       </a>
-    </article>
+    </li>
+  );
+}
+
+function OfferingGroup({ id, title, intro, items, tone }: { id: string; title: string; intro: string; items: Offering[]; tone: 'accent' | 'secondary' }) {
+  return (
+    <section id={id} aria-labelledby={`${id}-baslik`} className="container-mv grid scroll-mt-8 gap-8 py-20 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-16">
+      <div className="md:sticky md:top-8 md:self-start">
+        <h2 id={`${id}-baslik`} className="text-[clamp(32px,4vw,52px)] font-semibold leading-[1.1]">
+          {title}
+        </h2>
+        <p className="mt-3 max-w-[40ch] text-muted">{intro}</p>
+      </div>
+      <ul className="border-b border-line">
+        {items.map((o) => (
+          <OfferingRow key={o.slug} o={o} tone={tone} />
+        ))}
+      </ul>
+    </section>
   );
 }
 
 export default function Home() {
   return (
     <>
-      <section className="container-mv flex flex-wrap items-center gap-12 pb-28 pt-20 md:pt-24">
-        <div className="min-w-0 flex-[999_1_540px]">
-          <p className="mb-6 text-[15px] font-medium text-secondary">Gece yarısı da çalışan yazılımlar</p>
-          <h1 className="text-[clamp(42px,5.6vw,78px)] font-semibold leading-[1.04] tracking-[-0.03em]">
-            Sen uyurken işini <span className="text-accent-text">yürüten</span> sistemler kuruyorum.
-          </h1>
-          <p className="mt-7 max-w-[560px] text-[19px] text-muted">
-            Randevular kendiliğinden dolsun, müşteriler unutulmasın, siparişler Logo&apos;ya kendiliğinden düşsün. Ne istediğini yaz,
-            birlikte netleştirelim; kurulumu ben yaparım.
-          </p>
-          <div className="mt-9 flex flex-wrap gap-3">
-            <a href="#urunler" className={buttonClass('primary', 'px-7 py-4')}>
-              Ürünlere bak
-            </a>
-            <a href={telegramLink()} className={buttonClass('outline', 'gap-2 px-7 py-4')}>
-              <TelegramIcon />
-              Telegram&apos;dan yaz
-            </a>
-          </div>
-        </div>
-        <div aria-hidden="true" className="relative h-[420px] min-w-0 flex-[1_1_360px]">
-          <div className="absolute left-1/2 top-10 -ml-[130px] h-[260px] w-[260px] rounded-full bg-moon shadow-[0_0_80px_color-mix(in_srgb,var(--mv-moon)_40%,transparent),0_0_160px_color-mix(in_srgb,var(--mv-moon)_20%,transparent)]" />
-          <div className="absolute left-1/2 top-[70px] -ml-5 h-[46px] w-[46px] rounded-full bg-moon brightness-90" />
-          <div className="absolute left-1/2 top-[190px] ml-10 h-[30px] w-[30px] rounded-full bg-moon brightness-90" />
-          <div className="absolute left-[8%] top-5 h-1 w-1 rounded-full bg-fg" />
-          <div className="absolute right-[6%] top-[120px] h-[3px] w-[3px] rounded-full bg-fg" />
-          <div className="absolute left-[4%] top-[260px] h-[3px] w-[3px] rounded-full bg-secondary" />
-          <div className="absolute inset-x-0 bottom-2.5 flex items-center gap-3.5 rounded-[18px] border border-line bg-surface px-5 py-4">
-            <span className="h-2.5 w-2.5 rounded-full bg-success" />
-            <span className="text-[15px] text-muted">
-              <span className="font-semibold text-fg">03:12</span> · Yeni randevu alındı, hatırlatma planlandı
-            </span>
+      <section className="relative isolate overflow-hidden bg-[linear-gradient(to_bottom,var(--mv-background),var(--mv-sky)_70%)]">
+        <ValleyScene className="absolute inset-x-0 bottom-0 -z-10 h-[300px] w-full sm:h-[440px] lg:h-[520px]" />
+        <div className="container-mv pb-[260px] pt-16 sm:pb-[360px] md:pt-24 lg:pb-[300px]">
+          <div className="max-w-[640px]">
+            <h1 className="text-[clamp(42px,5.6vw,76px)] font-semibold leading-[1.04] tracking-[-0.03em]">
+              Sen uyurken işini yürüten sistemler kuruyorum.
+            </h1>
+            <p className="mt-7 max-w-[34em] text-[19px] text-muted">
+              Randevular kendiliğinden dolsun, müşteriler unutulmasın, siparişler Logo&apos;ya kendiliğinden düşsün. Ne istediğini yaz,
+              birlikte netleştirelim; kurulumu ben yaparım.
+            </p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <a href="#urunler" className={buttonClass('primary', 'px-7 py-4')}>
+                Ürünlere bak
+              </a>
+              <a href={telegramLink()} className={buttonClass('outline', 'gap-2 bg-bg/40 px-7 py-4 backdrop-blur-sm')}>
+                <TelegramIcon />
+                Telegram&apos;dan yaz
+              </a>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="urunler" className="container-mv scroll-mt-8 pb-24 pt-10">
-        <h2 className="mb-3 text-[clamp(32px,4vw,52px)] font-semibold">Ürünler</h2>
-        <p className="mb-12 max-w-[560px] text-muted">Her biri gerçek işletmelerin sorunlarından doğdu.</p>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
-          {PRODUCTS.map((o) => (
-            <OfferingCard key={o.slug} o={o} tone="accent" />
-          ))}
-        </div>
-      </section>
+      <OfferingGroup id="urunler" title="Ürünler" intro="Her biri gerçek işletmelerin sorunlarından doğdu." items={PRODUCTS} tone="accent" />
+      <OfferingGroup
+        id="logo"
+        title="Logo hizmetleri"
+        intro="Logo tarafında entegrasyon, uyarlama ve kural yazımı."
+        items={LOGO_SERVICES}
+        tone="secondary"
+      />
 
-      <section id="logo" className="container-mv scroll-mt-8 pb-28">
-        <h2 className="mb-3 text-[clamp(32px,4vw,52px)] font-semibold">Logo hizmetleri</h2>
-        <p className="mb-12 max-w-[560px] text-muted">Logo tarafında entegrasyon, uyarlama ve kural yazımı.</p>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
-          {LOGO_SERVICES.map((o) => (
-            <OfferingCard key={o.slug} o={o} tone="secondary" />
-          ))}
-        </div>
-      </section>
-
-      <section id="nasil" className="scroll-mt-8 border-y border-line bg-section px-6 py-28">
+      <section id="nasil" className="mt-8 scroll-mt-8 border-y border-line bg-section px-6 py-28">
         <div className="mx-auto max-w-[var(--mv-max-width)]">
           <h2 className="mb-14 text-[clamp(32px,4vw,52px)] font-semibold">Ayın evreleri gibi, dört adım</h2>
           <ol className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-8">
@@ -126,7 +130,7 @@ export default function Home() {
       <section id="iletisim" className="scroll-mt-8 border-t border-line px-6 py-24">
         <div className="mx-auto flex max-w-[var(--mv-max-width)] flex-wrap items-center justify-between gap-6">
           <div className="max-w-[680px]">
-            <h2 className="text-[clamp(34px,4.5vw,64px)] font-semibold tracking-[-0.03em]">Bu gece yaz, yarın sabah konuşalım.</h2>
+            <h2 className="text-[clamp(34px,4.5vw,64px)] font-semibold leading-[1.08] tracking-[-0.03em]">Bu gece yaz, yarın sabah konuşalım.</h2>
             <p className="mt-4 text-lg text-muted">Öneri, şikâyet ya da teklif için bana Telegram&apos;dan ulaş.</p>
           </div>
           <a href={telegramLink()} className={buttonClass('primary', 'gap-2 px-8 py-4 text-lg')}>
