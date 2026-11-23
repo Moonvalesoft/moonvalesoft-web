@@ -213,11 +213,14 @@ export default function Home() {
         </div>
         <div className="min-w-0 flex-[999_1_520px]">
           <h2 className="text-[clamp(32px,4vw,52px)] font-semibold">Merhaba, ben Ozanay.</h2>
-          <p className="mt-5 text-[19px] text-muted">
-            Logo ERP uyarlama ve entegrasyonunda takım lideriyim; C#/.NET ve SQL Server ile çalışıyorum. Moonvalesoft&apos;u, küçük
-            işletmelerin de sağlam yazılıma kolayca ulaşabilmesi için kurdum.
+          <p className="mt-5 max-w-[60ch] text-[19px] text-muted">
+            Logo ERP uyarlama ve entegrasyon projelerinde takım lideriyim. Her gün C#/.NET ve SQL Server ile çalışıyor, işletmelerin
+            sistemlerini birbirine bağlıyorum.
           </p>
-          <p className="mt-4 text-[19px] text-muted">Bana yazdığında karşında sistemi yazan kişi var.</p>
+          <p className="mt-4 max-w-[60ch] text-[19px] text-muted">
+            Moonvalesoft&apos;u, sağlam yazılım yalnız büyük şirketlerin işi olmasın diye kurdum.
+          </p>
+          <p className="mt-4 max-w-[60ch] text-[19px] font-medium text-fg">Bana yazdığında karşına çağrı merkezi değil, sistemi yazan kişi çıkar.</p>
         </div>
       </section>
 
