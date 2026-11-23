@@ -1,8 +1,11 @@
 # Moonvalesoft Web
 
-Moonvalesoft'un firma sitesi (`moonvalesoft.com`): ürün tanıtımı, üyelik, ödeme ve müşteri paneli.
+`moonvalesoft.com`: ürünler ve Logo hizmetleri; teklif için Telegram.
 
-- Kurallar ve kararlar: `CLAUDE.md`
-- Ekip (Claude agent'ları): `.claude/agents/` — pm, ui-ux, frontend, backend, qa, devops, security
-- Tasarım kodları: `design/tokens.json` (Gece ve Gündüz modu)
-- Tasarım tuvali: https://claude.ai/artifact/1SscxbqpGfU3zmStL96iVL
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # statik site: apps/web/out
+```
+
+İçerik: `apps/web/lib/site.ts`. Telegram adresi: `apps/web/.env.local` içine `NEXT_PUBLIC_TELEGRAM_USERNAME=kullaniciadi`.

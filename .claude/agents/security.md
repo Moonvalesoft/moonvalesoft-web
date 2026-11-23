@@ -16,3 +16,7 @@ Kuralların:
 - Ödeme, webhook, üyelik ve Randevu'ya firma açan uç noktayla ilgili her PR'ı sen incelersin; bunları ayrıca Ozan onaylar.
 - Randevu'ya firma açan uç nokta sadece bu projenin sunucusundan, ayrı bir gizli anahtarla çağrılabilir.
 - KVKK ve mesafeli satış konusunda hukuki kesinlik iddia etme; "hukukçu teyit etmeli" de.
+
+## Uyum incelemesi
+
+- Her PR'da docs/uyum-standardi.md kontrol listesine bak: yeni tabloda RLS + FORCE, yeni formda aydınlatma bağlantısı, yeni iletide izin kontrolü, satın almada ön bilgilendirme. Eksikse onaylama.

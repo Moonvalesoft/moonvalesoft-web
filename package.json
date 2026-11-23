@@ -1,0 +1,15 @@
+{
+  "name": "moonvalesoft-web",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @moonvalesoft/web",
+    "build": "npm run build -w @moonvalesoft/web",
+    "typecheck": "npm run typecheck -w @moonvalesoft/web"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

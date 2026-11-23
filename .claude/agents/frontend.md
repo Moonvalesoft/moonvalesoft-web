@@ -13,3 +13,7 @@ Kuralların:
 - Kart bilgisi alan bir form yazma; ödeme sağlayıcının sayfasına veya gömülü formuna yönlendir.
 - "Ödeme başarılı" ekranı, ödemenin kesinleştiğini backend'den sorar; adres çubuğundaki parametreye güvenmez.
 - Önce telefon (390 px), sonra masaüstü. Sıfırdan bileşen yazmadan önce shadcn/ui'da var mı bak.
+
+## Uyum
+
+- Kayıt formu `noticeVersion`, satın alma `preInfoVersion` + `distanceSalesVersion` gönderir; sürümleri `GET /api/legal`'dan alır, elle yazmaz.

@@ -1,18 +1,21 @@
 # Moonvalesoft Web
 
-Moonvalesoft'un firma sitesi: `moonvalesoft.com`. Ürünleri tanıtır, üyelik açtırır, ödemeyi alır ve satın alınan ürünü kendiliğinden kurar.
+Moonvalesoft'un firma sitesi: `moonvalesoft.com`. Ürünleri ve Logo hizmetlerini tanıtır; müşteri teklif, öneri ve şikâyet için Ozan'a **Telegram'dan** ulaşır.
 Kurucu ve son onay mercii: **Ozan**. Ana dala Ozan onaylamadan kod girmez.
 
-Hedef: Ozan satış sürecinde elle hiçbir şey yapmasın. Müşteri paketi seçer, üye olur, öder; ürün hazır olur, fatura e-postasına gider.
+Kapsam (Ozan, 23 Kasım 2026): üyelik, giriş, fiyat, ödeme ve hukuk sayfaları **yok**. Her ürün ve hizmette "Teklif al" düğmesi Telegram sohbetini açar. Önceki üyelikli/ödemeli sürüm `demo` dalında duruyor.
 
-## Ürünler
+## İçerik
 
-- Moonvale Randevu (aylık, kullanıcı başına) — ödeme sonrası `<firma>.moonvalesoft.com` kendiliğinden açılır.
-- CRM (aylık) — teyit edilecek: ayrı ürün mü, ne zaman satışa çıkacak.
-- Emlak Sistemi (aylık) — teyit edilecek.
-- Logo ERP Entegrasyonu — projeye göre teklif; ödeme siteden, aşama aşama alınır.
+Bütün ürün ve hizmet metinleri `apps/web/lib/site.ts` içinde. Telegram: `ozanay24` (`NEXT_PUBLIC_TELEGRAM_USERNAME` ile değişir).
 
-Fiyatlar Ozan'dan gelir. Fiyat, özellik veya yasal metin uydurma; bilinmiyorsa `[FİYAT]`, "teyit edilecek" yaz.
+- Ürünler: Moonvale Randevu, CRM, Emlak Sistemi.
+- Logo hizmetleri: Logo ERP entegrasyonu; Logo Object Designer ile uyarlama (Tiger serisi, Bordro Plus); Logo Cloud Connect kuralları.
+- "Nasıl çalışır": ayın dört evresi = projenin dört adımı (keşif, plan ve teklif, kurulum, destek), `PROJECT_PHASES`.
+- Logo: "Hilal Vadi" (hilal, içindeki vadiyi kucaklar), `design/brand/logo.svg`.
+- Sonra: her ürün için görsel/video sayfası (`/urunler/<slug>`), ürünler bitince.
+
+Fiyat, özellik veya müşteri sayısı uydurma; bilinmiyorsa yazma ya da "teyit edilecek" de.
 
 ## Tasarım kuralları (değiştirmeden önce Ozan'a sor)
 
@@ -23,25 +26,21 @@ Fiyatlar Ozan'dan gelir. Fiyat, özellik veya yasal metin uydurma; bilinmiyorsa 
 - Erişilebilirlik: her iki modda metin kontrastı en az 4.5:1, dokunma alanı en az 44 px, klavyeyle gezilebilir.
 - Onaylı tasarım tuvali: https://claude.ai/artifact/1SscxbqpGfU3zmStL96iVL (artboard "3 · Gece" ve "3b · Gündüz").
 
-## Teknik kararlar (taslak — Ozan onayı bekliyor)
+## Uyum
 
-- Moonvale Randevu ile aynı yığın, tek geliştirici iki farklı dünya öğrenmesin diye:
-  - Web: Next.js (arama motorları için sunucu tarafı sayfa), shadcn/ui + Tailwind.
-  - API: TypeScript + NestJS (Fastify), PostgreSQL.
-- Üyelik: e-posta + şifre, e-posta doğrulaması zorunlu. Müşteri paneli: paketlerim, faturalarım, destek taleplerim.
-- Ödeme: sağlayıcı henüz seçilmedi (aday: Lemon Squeezy / Paddle veya iyzico / PayTR). Kod tek bir `PaymentProvider` arayüzünün arkasında yazılır; sağlayıcı değişince sadece adaptör değişir.
-- Kart bilgisi bizde asla tutulmaz ve sunucumuzdan geçmez; sağlayıcının ödeme sayfası veya gömülü formu kullanılır.
-- Satın alma kesinleşmesi yalnızca sağlayıcının imzalı webhook'u ile olur; tarayıcıdan gelen "ödeme başarılı" yönlendirmesine güvenilmez. Webhook'lar idempotenttir.
-- Randevu satın alınınca Randevu API'sindeki yetkili bir uç noktayla firma (tenant) kendiliğinden açılır. Abonelik biterse firma dondurulur, veri silinmez.
-- Fatura: e-Arşiv zorunluluğu ve hangi entegratörün kullanılacağı teyit edilecek (muhasebeci ile).
-- Yasal sayfalar: KVKK aydınlatma metni, mesafeli satış sözleşmesi, ön bilgilendirme formu, iptal ve iade — metinleri hukukçu yazar, biz yer açarız.
-- Altyapı: Randevu ile aynı sunucu, Docker Compose, Caddy. `moonvalesoft.com` ve `www` bu projeye gider.
+Site şu an kişisel veri toplamıyor (form, üyelik, çerez yok; tema seçimi yalnız tarayıcıda). Bir form veya üyelik eklenirse `docs/uyum-standardi.md` (bütün Moonvalesoft ürünleri) hemen geçerli olur: aydınlatma metni, kampanya izni, RLS.
+
+## Teknik kararlar
+
+- Next.js, statik dışa aktarım (`output: 'export'`): sunucu ve veritabanı yok; `npm run build` çıktısı `apps/web/out` herhangi bir statik barındırmaya konur.
+- Tailwind; renkler `design/tokens.json` → `app/tokens.css`.
+- Fotoğraf GitHub sitesinden (`ozanaycelik.github.io/assets/img/profile.jpg`), yoksa baş harf.
+- Güvenlik başlıkları (CSP, HSTS) barındırma tarafında verilir.
 
 ## Çalışma kuralları (bütün roller)
 
 - Her değişiklik bir PR'dır; testler geçmeden ve Ozan onaylamadan birleştirme yok.
 - Ekran işi önce ui-ux'ten geçer: ui-ux tasarımı ve kabul kriterlerini yazar, frontend uygular, ui-ux PR'ı tasarıma uygunluk için inceler.
-- Kabul testlerini QA önceden yazar; kodu yazan ajan kendi kabul testini yazıp geçirmez.
-- Asla atlanmayacak testler: ödeme webhook'u (sahte, tekrarlanan, sırası bozuk istek), başarısız ödeme, abonelik iptali, bir üyenin başka üyenin faturasını görememesi.
+- Her PR'da: `npm run typecheck`, `npm run build`, iki modda ve telefonda görünüm kontrolü.
 - Uydurma rakam, fiyat veya hukuki kesinlik yazma; bilmiyorsan "teyit edilecek" de.
 - Yazışma dili Türkçe; kod, tablo ve değişken adları İngilizce.
