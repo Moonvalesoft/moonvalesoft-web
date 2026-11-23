@@ -7,10 +7,12 @@ Kapsam (Ozan, 23 Kasım 2026): üyelik, giriş, fiyat, ödeme ve hukuk sayfalar�
 
 ## İçerik
 
-Bütün ürün ve hizmet metinleri `apps/web/lib/site.ts` içinde. Telegram kullanıcı adı `NEXT_PUBLIC_TELEGRAM_USERNAME`.
+Bütün ürün ve hizmet metinleri `apps/web/lib/site.ts` içinde. Telegram: `ozanay24` (`NEXT_PUBLIC_TELEGRAM_USERNAME` ile değişir).
 
 - Ürünler: Moonvale Randevu, CRM, Emlak Sistemi.
 - Logo hizmetleri: Logo ERP entegrasyonu; Logo Object Designer ile uyarlama (Tiger serisi, Bordro Plus); Logo Cloud Connect kuralları.
+- "Nasıl çalışır": ayın dört evresi = projenin dört adımı (keşif, plan ve teklif, kurulum, destek), `PROJECT_PHASES`.
+- Logo: "Hilal Vadi" (hilal, içindeki vadiyi kucaklar), `design/brand/logo.svg`.
 - Sonra: her ürün için görsel/video sayfası (`/urunler/<slug>`), ürünler bitince.
 
 Fiyat, özellik veya müşteri sayısı uydurma; bilinmiyorsa yazma ya da "teyit edilecek" de.

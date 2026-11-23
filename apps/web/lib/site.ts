@@ -4,7 +4,7 @@
  */
 
 /** Telegram kullanıcı adı (@ olmadan). NEXT_PUBLIC_TELEGRAM_USERNAME ile de verilebilir. */
-export const TELEGRAM_USERNAME = process.env.NEXT_PUBLIC_TELEGRAM_USERNAME ?? '';
+export const TELEGRAM_USERNAME = process.env.NEXT_PUBLIC_TELEGRAM_USERNAME ?? 'ozanay24';
 
 /** Telegram sohbetini açar; mesaj kutusu `text` ile önceden dolar (Telegram destekliyorsa). */
 export function telegramLink(text?: string): string {
@@ -58,3 +58,13 @@ export const LOGO_SERVICES: Offering[] = [
 ];
 
 export const quoteText = (title: string) => `Merhaba Ozan, ${title} için teklif almak istiyorum.`;
+
+/** Ayın dört evresi = bir projenin dört adımı (ana sayfadaki "Nasıl çalışır"). */
+export type Phase = 'yeni' | 'ilk' | 'dolunay' | 'son';
+
+export const PROJECT_PHASES: { phase: Phase; moon: string; step: string; text: string }[] = [
+  { phase: 'yeni', moon: 'Yeni ay', step: 'Keşif', text: "Telegram'dan yazarsın; işini ve ihtiyacını birlikte konuşuruz." },
+  { phase: 'ilk', moon: 'İlk dördün', step: 'Plan ve teklif', text: 'Kapsamı netleştirir, sana özel teklifi ve takvimi çıkarırım.' },
+  { phase: 'dolunay', moon: 'Dolunay', step: 'Kurulum', text: 'Sistemi kurar, ayarlar ve çalışır hâlde teslim ederim.' },
+  { phase: 'son', moon: 'Son dördün', step: 'Destek', text: 'Kullandıkça iyileştirir, sorularına yanıt veririm.' },
+];

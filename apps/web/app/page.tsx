@@ -2,7 +2,8 @@ import { Icon, TelegramIcon } from '@/components/icon';
 import { Portrait } from '@/components/portrait';
 import { HeroScene, RidgeStrip } from '@/components/scene';
 import { buttonClass } from '@/components/ui/button';
-import { LOGO_SERVICES, PRODUCTS, quoteText, telegramLink, type Offering, type Tone } from '@/lib/site';
+import { MoonPhase } from '@/components/moon-phase';
+import { LOGO_SERVICES, PRODUCTS, PROJECT_PHASES, quoteText, telegramLink, type Offering, type Tone } from '@/lib/site';
 
 const TONE: Record<Tone, string> = {
   moon: 'var(--mv-tile-moon)',
@@ -10,15 +11,6 @@ const TONE: Record<Tone, string> = {
   teal: 'var(--mv-tile-teal)',
   water: 'var(--mv-tile-water)',
 };
-
-const GLOW = 'color-mix(in srgb, var(--mv-logo-moon) 35%, transparent)';
-
-const PHASES = [
-  { title: 'Bana yaz', text: "Telegram'dan ihtiyacını anlat.", inset: 0 },
-  { title: 'Konuşalım', text: 'Kapsamı birlikte netleştirelim.', inset: 15 },
-  { title: 'Teklifini al', text: 'Sana özel teklifi hazırlarım.', inset: 26 },
-  { title: 'Kurulumu ben yaparım', text: 'Kurar, teslim eder, yanında olurum.', inset: 48 },
-] as const;
 
 function OfferingRow({ o }: { o: Offering }) {
   const c = TONE[o.tone];
@@ -95,22 +87,27 @@ export default function Home() {
       <OfferingGroup id="urunler" title="Ürünler" intro="Her biri gerçek işletmelerin sorunlarından doğdu." items={PRODUCTS} />
       <OfferingGroup id="logo" title="Logo hizmetleri" intro="Logo tarafında entegrasyon, uyarlama ve kural yazımı." items={LOGO_SERVICES} />
 
-      <section id="nasil" className="mt-8 scroll-mt-8 border-y border-line bg-section px-6 py-28">
+      <section id="nasil" aria-labelledby="nasil-baslik" className="mt-8 scroll-mt-8 border-y border-line bg-section px-6 py-28">
         <div className="mx-auto max-w-[var(--mv-max-width)]">
-          <h2 className="mb-14 text-[clamp(32px,4vw,52px)] font-semibold">Ayın evreleri gibi, dört adım</h2>
-          <ol className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-8">
-            {PHASES.map((ph) => (
-              <li key={ph.title} className="flex flex-col gap-2.5">
-                <span
-                  aria-hidden="true"
-                  className="h-12 w-12 rounded-full border-2"
-                  style={{
-                    borderColor: 'var(--mv-logo-moon)',
-                    boxShadow: `inset -${ph.inset}px 0 0 var(--mv-logo-moon), 0 0 28px ${GLOW}`,
-                  }}
-                />
-                <h3 className="mt-2 font-sans text-xl font-semibold">{ph.title}</h3>
-                <p className="text-muted">{ph.text}</p>
+          <h2 id="nasil-baslik" className="text-[clamp(32px,4vw,52px)] font-semibold leading-[1.1]">
+            Her proje ayın dört evresinden geçer
+          </h2>
+          <p className="mt-3 max-w-[48ch] text-muted">Yeni aydan dolunaya: ilk mesajından sonra işin hangi evrede olduğunu hep bilirsin.</p>
+          <ol className="relative mt-16 grid gap-12 md:grid-cols-4 md:gap-8">
+            {/* Ayların yörüngesi: evreleri birbirine bağlar */}
+            <span aria-hidden="true" className="absolute left-9 top-9 hidden h-px w-[75%] border-t border-dashed border-line-strong md:block" />
+            {PROJECT_PHASES.map((p, i) => (
+              <li key={p.phase} className="relative flex gap-5 md:flex-col md:gap-0">
+                <span className="relative shrink-0 drop-shadow-[0_0_22px_color-mix(in_srgb,var(--mv-logo-moon)_35%,transparent)]">
+                  <MoonPhase phase={p.phase} />
+                </span>
+                <div className="md:mt-6">
+                  <p className="text-sm text-subtle">
+                    {i + 1}. evre · {p.moon}
+                  </p>
+                  <h3 className="mt-1 font-sans text-xl font-semibold">{p.step}</h3>
+                  <p className="mt-2 max-w-[32ch] text-muted">{p.text}</p>
+                </div>
               </li>
             ))}
           </ol>

@@ -1,9 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
-  <!-- Moonvalesoft logosu "Ay Vadisi" (Gece renkleri). Gündüz renkleri design/tokens.json'da. -->
-  <mask id="m"><rect width="120" height="120" fill="#fff"/><circle cx="76" cy="22" r="22" fill="#000"/></mask>
-  <circle cx="64" cy="32" r="25" fill="#F3E2A9" mask="url(#m)"/>
-  <path d="M50 100 L84 50 Q88 45 92 50 L122 100 Z" fill="#5FB3A0"/>
-  <path d="M-2 100 L32 56 Q36 51 40 56 L76 100 Z" fill="#2F7F72"/>
-  <rect x="0" y="98" width="120" height="16" fill="#2F7F72"/>
-  <path d="M64.5 86 C58 94 71 99.5 61.5 105 C55 109 51 111.5 48 114 H60 C61 112.5 62 110.5 66.5 107 C77 100.5 62 94 67.5 86 Z" fill="#7DB8EE"/>
+  <!-- Moonvalesoft logosu "Hilal Vadi" (Gece renkleri). Gündüz renkleri design/tokens.json'da. -->
+  <mask id="m"><rect width="120" height="120" fill="#fff"/><circle cx="74" cy="50" r="40" fill="#000"/></mask>
+    <clipPath id="ci"><circle cx="74" cy="50" r="40"/></clipPath>
+    <clipPath id="co"><circle cx="60" cy="60" r="50"/></clipPath>
+    <circle cx="60" cy="60" r="50" fill="#F3E2A9" mask="url(#m)"/>
+    <g clip-path="url(#co)"><g clip-path="url(#ci)">
+      <path d="M50 92 L82 46 Q85 42 88 46 L118 92 Z" fill="#5FB3A0"/>
+      <path d="M30 92 L58 56 Q61 52 64 56 L92 92 Z" fill="#2F7F72"/>
+      <path d="M72.5 70 C68 77 79 81 73 87 C70 90 66 91 62 92 H86 C82 90 84 86 81 82 C77 77 75 74 75.5 70 Z" fill="#7DC6F5"/>
+    </g></g>
 </svg>
