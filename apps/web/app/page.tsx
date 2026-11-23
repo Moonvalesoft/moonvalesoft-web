@@ -3,7 +3,7 @@ import { Portrait } from '@/components/portrait';
 import { HeroScene, RidgeStrip } from '@/components/scene';
 import { buttonClass } from '@/components/ui/button';
 import { MoonPhase } from '@/components/moon-phase';
-import { LOGO_SERVICES, PRODUCTS, PROJECT_PHASES, quoteText, telegramLink, type Offering, type Tone } from '@/lib/site';
+import { INTEGRATIONS, LOGO_SERVICES, PROJECT_PHASES, SOFTWARE, quoteText, telegramLink, type Offering, type Tone } from '@/lib/site';
 
 const TONE: Record<Tone, string> = {
   moon: 'var(--mv-tile-moon)',
@@ -56,6 +56,98 @@ function OfferingGroup({ id, title, intro, items }: { id: string; title: string;
   );
 }
 
+function TileIcon({ o, size = 'md' }: { o: Offering; size?: 'md' | 'lg' }) {
+  const c = TONE[o.tone];
+  return (
+    <span
+      className={`flex shrink-0 items-center justify-center rounded-md ${size === 'lg' ? 'h-16 w-16' : 'h-14 w-14'}`}
+      style={{ background: `color-mix(in srgb, ${c} 16%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${c} 35%, transparent)` }}
+    >
+      <Icon name={o.icon} color={c} />
+    </span>
+  );
+}
+
+function QuoteButton({ o, className = '' }: { o: Offering; className?: string }) {
+  return (
+    <a href={telegramLink(quoteText(o.title))} className={buttonClass('outline', `gap-2 ${className}`)} aria-label={`${o.title} için teklif al`}>
+      <TelegramIcon />
+      Teklif al
+    </a>
+  );
+}
+
+/** Yazılımlar: dört büyük kart; her kartın köşesinde kendi renginde ışıltı. */
+function SoftwareSection() {
+  return (
+    <section id="urunler" aria-labelledby="urunler-baslik" className="container-mv scroll-mt-8 pb-16 pt-20">
+      <h2 id="urunler-baslik" className="text-[clamp(32px,4vw,52px)] font-semibold leading-[1.1]">
+        Yazılımlar
+      </h2>
+      <p className="mt-3 max-w-[48ch] text-muted">Her biri gerçek işletmelerin sorunlarından doğdu.</p>
+      <ul className="mt-10 grid gap-4 md:grid-cols-2">
+        {SOFTWARE.map((o) => {
+          const c = TONE[o.tone];
+          return (
+            <li
+              key={o.slug}
+              className="relative flex flex-col gap-5 overflow-hidden rounded-lg border border-line bg-surface p-8"
+              style={{ backgroundImage: `radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, ${c} 14%, transparent), transparent 60%)` }}
+            >
+              <TileIcon o={o} size="lg" />
+              <div className="grow">
+                <h3 className="text-[28px] font-semibold leading-tight">{o.title}</h3>
+                <p className="mt-2 max-w-[40ch] text-muted">{o.text}</p>
+              </div>
+              <QuoteButton o={o} className="self-start" />
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+/** Entegrasyonlar: hepsi tek bir merkeze, senin sistemine bağlanır. */
+function IntegrationsSection() {
+  return (
+    <section id="entegrasyonlar" aria-labelledby="entegrasyonlar-baslik" className="container-mv scroll-mt-8 py-16">
+      <h2 id="entegrasyonlar-baslik" className="text-[clamp(32px,4vw,52px)] font-semibold leading-[1.1]">
+        Entegrasyonlar
+      </h2>
+      <p className="mt-3 max-w-[48ch] text-muted">Satış, banka ve kasa tek bir yerde buluşsun; elle aktarma bitsin.</p>
+      <div className="mt-10">
+        <div className="flex justify-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-5 py-2.5 text-[15px] font-semibold">
+            <Icon name="sync" color="var(--mv-tile-water)" />
+            Senin sistemin
+          </span>
+        </div>
+        {/* Bağlantı çizgileri: merkezden her entegrasyona */}
+        <div aria-hidden="true" className="relative hidden h-12 md:block">
+          <span className="absolute left-1/2 top-0 h-6 border-l border-dashed border-line-strong" />
+          <span className="absolute left-[16.66%] right-[16.66%] top-6 border-t border-dashed border-line-strong" />
+          <span className="absolute left-[16.66%] top-6 h-6 border-l border-dashed border-line-strong" />
+          <span className="absolute left-1/2 top-6 h-6 border-l border-dashed border-line-strong" />
+          <span className="absolute right-[16.66%] top-6 h-6 border-l border-dashed border-line-strong" />
+        </div>
+        <ul className="mt-6 grid gap-4 md:mt-0 md:grid-cols-3">
+          {INTEGRATIONS.map((o) => (
+            <li key={o.slug} className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-7">
+              <TileIcon o={o} />
+              <div className="grow">
+                <h3 className="text-xl font-semibold">{o.title}</h3>
+                <p className="mt-1.5 text-muted">{o.text}</p>
+              </div>
+              <QuoteButton o={o} className="self-start" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   return (
     <>
@@ -84,7 +176,8 @@ export default function Home() {
         </div>
       </section>
 
-      <OfferingGroup id="urunler" title="Ürünler" intro="Her biri gerçek işletmelerin sorunlarından doğdu." items={PRODUCTS} />
+      <SoftwareSection />
+      <IntegrationsSection />
       <OfferingGroup id="logo" title="Logo hizmetleri" intro="Logo tarafında entegrasyon, uyarlama ve kural yazımı." items={LOGO_SERVICES} />
 
       <section id="nasil" aria-labelledby="nasil-baslik" className="mt-8 scroll-mt-8 border-y border-line bg-section px-6 py-28">
@@ -119,7 +212,7 @@ export default function Home() {
           <Portrait />
         </div>
         <div className="min-w-0 flex-[999_1_520px]">
-          <h2 className="text-[clamp(32px,4vw,52px)] font-semibold">Merhaba, ben Ozan.</h2>
+          <h2 className="text-[clamp(32px,4vw,52px)] font-semibold">Merhaba, ben Ozanay.</h2>
           <p className="mt-5 text-[19px] text-muted">
             Logo ERP uyarlama ve entegrasyonunda takım lideriyim; C#/.NET ve SQL Server ile çalışıyorum. Moonvalesoft&apos;u, küçük
             işletmelerin de sağlam yazılıma kolayca ulaşabilmesi için kurdum.

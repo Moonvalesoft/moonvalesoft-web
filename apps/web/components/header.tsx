@@ -8,9 +8,10 @@ export function Header() {
   return (
     <header className="container-mv relative z-20 flex h-24 items-center justify-between gap-4">
       <Logo />
-      <nav aria-label="Ana menü" className="hidden gap-x-7 text-[15px] md:flex [&>a]:inline-flex [&>a]:min-h-11 [&>a]:items-center">
-        <a href="#urunler" className="text-muted no-underline hover:text-fg">Ürünler</a>
-        <a href="#logo" className="text-muted no-underline hover:text-fg">Logo hizmetleri</a>
+      <nav aria-label="Ana menü" className="hidden gap-x-6 text-[15px] lg:flex [&>a]:inline-flex [&>a]:min-h-11 [&>a]:items-center">
+        <a href="#urunler" className="text-muted no-underline hover:text-fg">Yazılımlar</a>
+        <a href="#entegrasyonlar" className="text-muted no-underline hover:text-fg">Entegrasyonlar</a>
+        <a href="#logo" className="text-muted no-underline hover:text-fg">Logo</a>
         <a href="#nasil" className="text-muted no-underline hover:text-fg">Nasıl çalışır</a>
         <a href="#ben" className="text-muted no-underline hover:text-fg">Hakkımda</a>
       </nav>
