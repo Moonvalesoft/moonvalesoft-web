@@ -22,10 +22,7 @@
   --color-on-secondary: var(--mv-on-secondary);
   --color-success: var(--mv-success);
   --color-danger: var(--mv-danger);
-  --color-sky: var(--mv-sky);
-  --color-vale-far: var(--mv-vale-far);
-  --color-vale-mid: var(--mv-vale-mid);
-  --color-vale-near: var(--mv-vale-near);
+
   --font-sans: "Inter Variable", system-ui, sans-serif;
   --font-heading: "Space Grotesk Variable", system-ui, sans-serif;
   --radius-sm: var(--mv-radius-sm);
@@ -58,10 +55,3 @@
   .container-mv { width: 100%; max-width: var(--mv-max-width); margin-inline: auto; padding-inline: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
-
-/* Vadi: ay bir kez yükselir; hareket kapalıysa yerinde durur. */
-@keyframes mv-moonrise {
-  from { transform: translateY(70px); opacity: 0.6; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.mv-moonrise { animation: mv-moonrise 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; transform-box: fill-box; }

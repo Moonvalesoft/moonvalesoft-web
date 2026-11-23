@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <!-- Moonvalesoft logosu "Ay Vadisi" (Gece renkleri). Gündüz renkleri design/tokens.json'da. -->
+  <mask id="m"><rect width="120" height="120" fill="#fff"/><circle cx="76" cy="22" r="22" fill="#000"/></mask>
+  <circle cx="64" cy="32" r="25" fill="#F3E2A9" mask="url(#m)"/>
+  <path d="M50 100 L84 50 Q88 45 92 50 L122 100 Z" fill="#5FB3A0"/>
+  <path d="M-2 100 L32 56 Q36 51 40 56 L76 100 Z" fill="#2F7F72"/>
+  <rect x="0" y="98" width="120" height="16" fill="#2F7F72"/>
+  <path d="M64.5 86 C58 94 71 99.5 61.5 105 C55 109 51 111.5 48 114 H60 C61 112.5 62 110.5 66.5 107 C77 100.5 62 94 67.5 86 Z" fill="#7DB8EE"/>
+</svg>

@@ -1,6 +1,6 @@
 import { Icon, TelegramIcon } from '@/components/icon';
 import { Portrait } from '@/components/portrait';
-import { ValleyScene } from '@/components/valley';
+import { Mark } from '@/components/mark';
 import { buttonClass } from '@/components/ui/button';
 import { LOGO_SERVICES, PRODUCTS, quoteText, telegramLink, type Offering } from '@/lib/site';
 
@@ -54,26 +54,28 @@ function OfferingGroup({ id, title, intro, items, tone }: { id: string; title: s
 export default function Home() {
   return (
     <>
-      <section className="relative isolate overflow-hidden bg-[linear-gradient(to_bottom,var(--mv-background),var(--mv-sky)_70%)]">
-        <ValleyScene className="absolute inset-x-0 bottom-0 -z-10 h-[300px] w-full sm:h-[440px] lg:h-[520px]" />
-        <div className="container-mv pb-[260px] pt-16 sm:pb-[360px] md:pt-24 lg:pb-[300px]">
-          <div className="max-w-[640px]">
-            <h1 className="text-[clamp(42px,5.6vw,76px)] font-semibold leading-[1.04] tracking-[-0.03em]">
-              Sen uyurken işini yürüten sistemler kuruyorum.
-            </h1>
-            <p className="mt-7 max-w-[34em] text-[19px] text-muted">
-              Randevular kendiliğinden dolsun, müşteriler unutulmasın, siparişler Logo&apos;ya kendiliğinden düşsün. Ne istediğini yaz,
-              birlikte netleştirelim; kurulumu ben yaparım.
-            </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <a href="#urunler" className={buttonClass('primary', 'px-7 py-4')}>
-                Ürünlere bak
-              </a>
-              <a href={telegramLink()} className={buttonClass('outline', 'gap-2 bg-bg/40 px-7 py-4 backdrop-blur-sm')}>
-                <TelegramIcon />
-                Telegram&apos;dan yaz
-              </a>
-            </div>
+      <section className="container-mv flex flex-wrap items-center gap-12 pb-24 pt-16 md:pt-24">
+        <div className="min-w-0 flex-[999_1_520px]">
+          <h1 className="text-[clamp(42px,5.6vw,76px)] font-semibold leading-[1.04] tracking-[-0.03em]">
+            Sen uyurken işini yürüten sistemler kuruyorum.
+          </h1>
+          <p className="mt-7 max-w-[34em] text-[19px] text-muted">
+            Randevular kendiliğinden dolsun, müşteriler unutulmasın, siparişler Logo&apos;ya kendiliğinden düşsün. Ne istediğini yaz,
+            birlikte netleştirelim; kurulumu ben yaparım.
+          </p>
+          <div className="mt-9 flex flex-wrap gap-3">
+            <a href="#urunler" className={buttonClass('primary', 'px-7 py-4')}>
+              Ürünlere bak
+            </a>
+            <a href={telegramLink()} className={buttonClass('outline', 'gap-2 px-7 py-4')}>
+              <TelegramIcon />
+              Telegram&apos;dan yaz
+            </a>
+          </div>
+        </div>
+        <div className="flex min-w-0 flex-[1_1_300px] justify-center">
+          <div className="w-[min(100%,340px)] [&>svg]:h-auto [&>svg]:w-full">
+            <Mark size={420} />
           </div>
         </div>
       </section>
