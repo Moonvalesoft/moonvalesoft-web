@@ -1,4 +1,4 @@
-import { telegramLink } from '@/lib/site';
+import { contactLink } from '@/lib/site';
 import { TelegramIcon } from './icon';
 import { Logo } from './logo';
 import { ThemeToggle } from './theme';
@@ -17,7 +17,7 @@ export function Header() {
       </nav>
       <div className="flex shrink-0 items-center gap-2 text-[15px] sm:gap-3">
         <ThemeToggle />
-        <a href={telegramLink()} className={buttonClass("primary", "gap-2 px-3 sm:px-5")}>
+        <a href={contactLink()} className={buttonClass("primary", "gap-2 px-3 sm:px-5")}>
           <TelegramIcon />
           <span className="sr-only sm:not-sr-only">Bana yaz</span>
         </a>

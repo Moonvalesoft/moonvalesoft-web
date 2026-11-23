@@ -27,6 +27,8 @@ jobs:
         env:
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          # Telegram botu: depo değişkeni TELEGRAM_BOT (boşsa düğmeler doğrudan ozanay24'e gider)
+          NEXT_PUBLIC_TELEGRAM_BOT: ${{ vars.TELEGRAM_BOT }}
       - run: touch apps/web/out/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:

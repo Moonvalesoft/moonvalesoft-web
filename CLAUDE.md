@@ -7,7 +7,9 @@ Kapsam (Ozan, 23 Kasım 2026): üyelik, giriş, fiyat, ödeme ve hukuk sayfalar�
 
 ## İçerik
 
-Bütün ürün ve hizmet metinleri `apps/web/lib/site.ts` içinde. Telegram: `ozanay24` (`NEXT_PUBLIC_TELEGRAM_USERNAME` ile değişir).
+Bütün ürün ve hizmet metinleri `apps/web/lib/offerings.ts` içinde (site ve bot ortak). Telegram: `ozanay24`; bot kurulunca düğmeler bota gider (`TELEGRAM_BOT` depo değişkeni, bkz. `apps/bot/README.md`).
+
+- Telegram botu (`apps/bot`, Cloudflare Workers): Teklif / Şikâyet / Öneri seçtirir, teklifte ürünü sorar, talebi Ozanay'a iletir, kişiye "24 saat içerisinde dönüş yapılacaktır" der; kayıt tutmaz.
 
 - Yazılımlar (`SOFTWARE`): Randevu, CRM, Emlak Sistemi, B2B.
 - Entegrasyonlar (`INTEGRATIONS`): E-Ticaret, Banka, Kasa; "Senin sistemin" merkezine bağlanır.
